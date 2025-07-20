@@ -1,30 +1,91 @@
-import Image from "next/image";
+"use client";
+import HeroSection from "./sections/HeroSection";
+import StatsSection from "./sections/StatsSection";
+import ServicesSection from "./sections/ServicesSection";
+import CarriersSection from "./sections/CarriersSection";
+import IntegrationsSection from "./sections/IntegrationsSection";
 
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
-            Welcome to Ship It Smart
-          </h1>
-          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Your modern solution for smart shipping and logistics management.
-          </p>
-          <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-            <div className="rounded-md shadow">
-              <button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10 transition-colors duration-200">
-                Get Started
-              </button>
-            </div>
-            <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-              <button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition-colors duration-200">
-                Learn More
-              </button>
-            </div>
-          </div>
-        </div>
-      </main>
+      <HeroSection />
+      <StatsSection />
+      <ServicesSection />
+      <CarriersSection />
+      <IntegrationsSection />
+      <style jsx>{`
+        @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        @keyframes scale-pulse {
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.08);
+          }
+        }
+        @keyframes dash {
+          0% {
+            stroke-dashoffset: 20;
+          }
+          100% {
+            stroke-dashoffset: 0;
+          }
+        }
+        @keyframes spin-slow {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes spin-reverse {
+          from {
+            transform: rotate(360deg);
+          }
+          to {
+            transform: rotate(0deg);
+          }
+        }
+        .animate-scroll {
+          animation: scroll 30s linear infinite;
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        .animate-scale-pulse {
+          animation: scale-pulse 4s ease-in-out infinite;
+        }
+        .animate-dash {
+          animation: dash 3s linear infinite;
+        }
+        .animate-spin-slow {
+          animation: spin-slow 20s linear infinite;
+        }
+        .animate-spin-reverse {
+          animation: spin-reverse 15s linear infinite;
+        }
+        .animate-shipping-routes {
+          animation: float 4s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
