@@ -10,12 +10,9 @@ export default function IntegrationsSection() {
     "ALL",
     "ECOMMERCE STORE",
     "MARKETPLACE",
-    "INVENTORY MANAGEMENT",
+    "WMS",
     "ORDER MANAGEMENT",
-    "WAREHOUSING",
-    "ERP",
     "FINANCE",
-    "CROWDFUNDING",
     "API",
   ];
 
@@ -85,14 +82,14 @@ export default function IntegrationsSection() {
     {
       name: "Linnworks",
       description: "Automate your multi-channel inventory and order management",
-      category: "INVENTORY MANAGEMENT",
+      category: "WMS",
       color: "bg-[#1E3A8A]",
       textColor: "text-white",
     },
     {
       name: "Aimco",
       description: "Integrate with Aimco for advanced warehouse management",
-      category: "WAREHOUSING",
+      category: "WMS",
       color: "bg-[#6B7280]",
       textColor: "text-white",
     },
@@ -100,7 +97,7 @@ export default function IntegrationsSection() {
       name: "Mintsoft",
       description:
         "Connect Mintsoft for comprehensive warehouse and inventory control",
-      category: "WAREHOUSING",
+      category: "WMS",
       color: "bg-[#10B981]",
       textColor: "text-white",
     },
@@ -108,7 +105,7 @@ export default function IntegrationsSection() {
       name: "Veeqo",
       description:
         "Sync with Veeqo for multi-channel inventory and shipping management",
-      category: "INVENTORY MANAGEMENT",
+      category: "WMS",
       color: "bg-[#8B5CF6]",
       textColor: "text-white",
     },
@@ -166,29 +163,6 @@ export default function IntegrationsSection() {
                     {category}
                   </button>
                 ))}
-              </div>
-
-              {/* View Shipping Solutions Link */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <a
-                  href="#"
-                  className="flex items-center text-[#4A90E2] font-medium hover:text-[#EB993C] transition-colors"
-                >
-                  VIEW SHIPPING SOLUTIONS
-                  <svg
-                    className="w-4 h-4 ml-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </a>
               </div>
             </div>
           </div>

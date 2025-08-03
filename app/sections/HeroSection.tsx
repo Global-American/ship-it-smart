@@ -68,6 +68,7 @@ export default function HeroSection() {
                 Speak to an expert
               </button>
               <button
+                onClick={() => window.location.assign("/demo")}
                 className="bg-transparent border-2 border-white text-white font-semibold px-8 py-4 rounded-full text-lg hover:bg-white hover:text-[#1F447B] transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
                 style={{ transition: "background 0.2s, color 0.2s" }}
               >

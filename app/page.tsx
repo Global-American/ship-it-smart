@@ -4,6 +4,7 @@ import StatsSection from "./sections/StatsSection";
 import ServicesSection from "./sections/ServicesSection";
 import CarriersSection from "./sections/CarriersSection";
 import IntegrationsSection from "./sections/IntegrationsSection";
+import TestimonialsSection from "./sections/TestimonialsSection";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <ServicesSection />
       <CarriersSection />
       <IntegrationsSection />
+      <TestimonialsSection />
       <style jsx>{`
         @keyframes scroll {
           0% {
