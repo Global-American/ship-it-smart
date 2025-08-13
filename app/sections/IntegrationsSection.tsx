@@ -14,6 +14,7 @@ export default function IntegrationsSection() {
     "ORDER MANAGEMENT",
     "FINANCE",
     "API",
+    "CARRIERS",
   ];
 
   const integrations = [
@@ -24,6 +25,99 @@ export default function IntegrationsSection() {
       category: "API",
       color: "bg-[#A8E6CF]",
       textColor: "text-[#2E7D5A]",
+    },
+    // Carriers
+    {
+      name: "Royal Mail",
+      description:
+        "Connect with Royal Mail for reliable UK domestic and international shipping",
+      category: "CARRIERS",
+      color: "bg-[#E60012]",
+      textColor: "text-white",
+    },
+    {
+      name: "DPD",
+      description:
+        "Integrate with DPD for fast and secure parcel delivery across Europe",
+      category: "CARRIERS",
+      color: "bg-[#D40511]",
+      textColor: "text-white",
+    },
+    {
+      name: "UPS",
+      description:
+        "Ship with UPS for worldwide express and standard delivery services",
+      category: "CARRIERS",
+      color: "bg-[#8B4513]",
+      textColor: "text-white",
+    },
+    {
+      name: "FedEx",
+      description:
+        "Connect with FedEx for premium international shipping solutions",
+      category: "CARRIERS",
+      color: "bg-[#4D148C]",
+      textColor: "text-white",
+    },
+    {
+      name: "DHL",
+      description:
+        "Integrate with DHL for global express delivery and logistics",
+      category: "CARRIERS",
+      color: "bg-[#FFCC00]",
+      textColor: "text-black",
+    },
+    {
+      name: "Hermes",
+      description: "Ship with Hermes for cost-effective UK parcel delivery",
+      category: "CARRIERS",
+      color: "bg-[#8B0000]",
+      textColor: "text-white",
+    },
+    {
+      name: "Yodel",
+      description: "Connect with Yodel for flexible UK delivery solutions",
+      category: "CARRIERS",
+      color: "bg-[#FF6B35]",
+      textColor: "text-white",
+    },
+    {
+      name: "TNT",
+      description:
+        "Integrate with TNT for express delivery across Europe and beyond",
+      category: "CARRIERS",
+      color: "bg-[#FF8C00]",
+      textColor: "text-white",
+    },
+    {
+      name: "Parcelforce",
+      description:
+        "Connect with Parcelforce for UK express and international delivery",
+      category: "CARRIERS",
+      color: "bg-[#1F447B]",
+      textColor: "text-white",
+    },
+    {
+      name: "XDP",
+      description: "Integrate with XDP for next-day delivery across the UK",
+      category: "CARRIERS",
+      color: "bg-[#00A651]",
+      textColor: "text-white",
+    },
+    {
+      name: "APC",
+      description: "Ship with APC for reliable overnight delivery services",
+      category: "CARRIERS",
+      color: "bg-[#E31837]",
+      textColor: "text-white",
+    },
+    {
+      name: "Collect+",
+      description:
+        "Connect with Collect+ for convenient parcel collection services",
+      category: "CARRIERS",
+      color: "bg-[#7B68EE]",
+      textColor: "text-white",
     },
     {
       name: "Etsy",

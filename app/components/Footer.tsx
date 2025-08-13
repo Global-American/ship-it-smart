@@ -56,7 +56,7 @@ const Footer = () => {
             <h3 className="text-[#1F447B] font-semibold text-lg mb-4">
               Quick <span className="text-[#EB993C]">Links</span>
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-1">
               <li>
                 <Link
                   href="/"
@@ -67,7 +67,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/services"
+                  href="/#services"
                   className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
                 >
                   Services
@@ -75,10 +75,26 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/integrations"
+                  href="/#integrations"
                   className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
                 >
                   Integrations
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/quote"
+                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
+                >
+                  Quote
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/demo"
+                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
+                >
+                  Demo
                 </Link>
               </li>
               <li>

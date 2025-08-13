@@ -43,7 +43,7 @@ export default function HeroSection() {
         </svg>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full relative z-10">
+      <div className="max-w-none mx-auto px-4 sm:px-8 lg:px-16 py-12 w-[90%] relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="text-left">
@@ -73,6 +73,13 @@ export default function HeroSection() {
                 style={{ transition: "background 0.2s, color 0.2s" }}
               >
                 Experience our demo
+              </button>
+              <button
+                onClick={() => window.location.assign("/quote")}
+                className="bg-[#EB993C] text-white font-semibold px-8 py-4 rounded-full text-lg hover:bg-[#d4822a] transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:ring-offset-2"
+                style={{ transition: "background 0.2s, color 0.2s" }}
+              >
+                Get a quote
               </button>
             </div>
 

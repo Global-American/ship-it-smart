@@ -10,6 +10,8 @@ const navItems = [
   { name: "Home", href: "#home" },
   { name: "Services", href: "#services" },
   { name: "Integrations", href: "#integrations" },
+  { name: "Quote", href: "/quote" },
+  { name: "Demo", href: "/demo" },
   { name: "About Us", href: "/about" },
   { name: "Contact Us", href: "/contact" },
 ];
@@ -26,6 +28,8 @@ const Navigation = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isContactPage, setIsContactPage] = useState(false);
   const [isAboutPage, setIsAboutPage] = useState(false);
+  const [isDemoPage, setIsDemoPage] = useState(false);
+  const [isQuotePage, setIsQuotePage] = useState(false);
   const [navUnderlineKey, setNavUnderlineKey] = useState("home");
   const router = useRouter();
 
@@ -35,17 +39,22 @@ const Navigation = () => {
     if (typeof window !== "undefined") {
       setIsContactPage(window.location.pathname === "/contact");
       setIsAboutPage(window.location.pathname === "/about");
+      setIsDemoPage(window.location.pathname === "/demo");
+      setIsQuotePage(window.location.pathname === "/quote");
       // Set underline key based on current page
       if (window.location.pathname === "/contact")
         setNavUnderlineKey("contact");
       else if (window.location.pathname === "/about")
         setNavUnderlineKey("about");
+      else if (window.location.pathname === "/demo") setNavUnderlineKey("demo");
+      else if (window.location.pathname === "/quote")
+        setNavUnderlineKey("quote");
       else setNavUnderlineKey(activeSection);
     }
   }, [activeSection]);
 
   useEffect(() => {
-    if (isContactPage || isAboutPage) return;
+    if (isContactPage || isAboutPage || isDemoPage || isQuotePage) return;
 
     const handleScroll = () => {
       const sections = ["home", "services", "integrations", "about", "contact"];
@@ -72,12 +81,14 @@ const Navigation = () => {
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isContactPage, isAboutPage]);
+  }, [isContactPage, isAboutPage, isDemoPage, isQuotePage]);
 
   const handleNavClick = (href: string) => {
     let nextKey = "";
     if (href === "/contact") nextKey = "contact";
     else if (href === "/about") nextKey = "about";
+    else if (href === "/demo") nextKey = "demo";
+    else if (href === "/quote") nextKey = "quote";
     else nextKey = href.replace("#", "");
 
     setNavUnderlineKey(nextKey);
@@ -87,7 +98,7 @@ const Navigation = () => {
       setIsOpen(false);
       return;
     }
-    if (isContactPage || isAboutPage) {
+    if (isContactPage || isAboutPage || isDemoPage || isQuotePage) {
       // Always go to home page for #home, otherwise go to main page and scroll
       if (href === "#home") {
         router.push("/");
@@ -123,22 +134,26 @@ const Navigation = () => {
             </Link>
           </div>
           {/* Desktop Navigation - Right aligned */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => {
               const sectionId = item.href.replace("#", "");
               // Use navUnderlineKey for underline animation
               const isActive =
                 (item.href === "/about" && navUnderlineKey === "about") ||
                 (item.href === "/contact" && navUnderlineKey === "contact") ||
+                (item.href === "/demo" && navUnderlineKey === "demo") ||
+                (item.href === "/quote" && navUnderlineKey === "quote") ||
                 (item.href !== "/about" &&
                   item.href !== "/contact" &&
+                  item.href !== "/demo" &&
+                  item.href !== "/quote" &&
                   navUnderlineKey === sectionId);
 
               return (
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item.href)}
-                  className={`relative font-medium text-base px-3 py-2 transition-colors duration-200
+                  className={`relative font-medium text-base px-2 py-2 transition-colors duration-200
                     ${
                       isActive
                         ? "text-[#1F447B]"
@@ -168,18 +183,31 @@ const Navigation = () => {
             })}
 
             {/* Login Button */}
-            <Link href="/login">
+            <a
+              href="https://connexx.co.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <button
-                className="font-medium rounded-full px-8 py-2.5 text-base transition-colors duration-200"
+                className="font-medium rounded-full px-8 py-2.5 text-base transition-colors duration-200 border-2"
                 style={{
-                  background: COLORS.accent,
+                  borderColor: COLORS.accent,
                   color: "#fff",
+                  background: COLORS.accent,
                   cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = COLORS.accent;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = COLORS.accent;
+                  e.currentTarget.style.color = "#fff";
                 }}
               >
                 Login
               </button>
-            </Link>
+            </a>
           </div>
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
@@ -234,6 +262,12 @@ const Navigation = () => {
             const sectionId = item.href.replace("#", "");
             const isActive = isContactPage
               ? item.href === "/contact"
+              : isAboutPage
+              ? item.href === "/about"
+              : isDemoPage
+              ? item.href === "/demo"
+              : isQuotePage
+              ? item.href === "/quote"
               : item.href === "/contact"
               ? false
               : activeSection === sectionId;
@@ -241,7 +275,7 @@ const Navigation = () => {
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item.href)}
-                className={`block w-full text-left font-medium text-base px-3 py-2 rounded-md transition-colors duration-200
+                className={`block w-full text-left font-medium text-base px-2 py-2 rounded-md transition-colors duration-200
                   ${
                     isActive
                       ? "text-[#1F447B] bg-gray-50"
@@ -252,14 +286,22 @@ const Navigation = () => {
               </button>
             );
           })}
-          <Link href="/login">
+          <a
+            href="https://connexx.co.uk"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <button
-              className="w-full mt-2 font-medium rounded-full px-3 py-2 text-base transition-colors duration-200"
-              style={{ background: COLORS.accent, color: "#fff" }}
+              className="w-full mt-2 font-medium rounded-full px-2 py-2 text-base transition-colors duration-200 border-2"
+              style={{
+                borderColor: COLORS.accent,
+                color: "#fff",
+                background: COLORS.accent,
+              }}
             >
               Login
             </button>
-          </Link>
+          </a>
         </div>
       )}
     </nav>
