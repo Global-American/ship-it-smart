@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 const navItems = [
   { name: "Home", href: "#home" },
   { name: "Services", href: "#services" },
-  { name: "Integrations", href: "#integrations" },
+  { name: "Integrations", href: "/integrations" },
   { name: "Quote", href: "/quote" },
   { name: "Demo", href: "/demo" },
   { name: "About Us", href: "/about" },
@@ -30,6 +30,7 @@ const Navigation = () => {
   const [isAboutPage, setIsAboutPage] = useState(false);
   const [isDemoPage, setIsDemoPage] = useState(false);
   const [isQuotePage, setIsQuotePage] = useState(false);
+  const [isIntegrationsPage, setIsIntegrationsPage] = useState(false);
   const [navUnderlineKey, setNavUnderlineKey] = useState("home");
   const router = useRouter();
 
@@ -41,6 +42,7 @@ const Navigation = () => {
       setIsAboutPage(window.location.pathname === "/about");
       setIsDemoPage(window.location.pathname === "/demo");
       setIsQuotePage(window.location.pathname === "/quote");
+      setIsIntegrationsPage(window.location.pathname === "/integrations");
       // Set underline key based on current page
       if (window.location.pathname === "/contact")
         setNavUnderlineKey("contact");
@@ -49,15 +51,24 @@ const Navigation = () => {
       else if (window.location.pathname === "/demo") setNavUnderlineKey("demo");
       else if (window.location.pathname === "/quote")
         setNavUnderlineKey("quote");
+      else if (window.location.pathname === "/integrations")
+        setNavUnderlineKey("integrations");
       else setNavUnderlineKey(activeSection);
     }
   }, [activeSection]);
 
   useEffect(() => {
-    if (isContactPage || isAboutPage || isDemoPage || isQuotePage) return;
+    if (
+      isContactPage ||
+      isAboutPage ||
+      isDemoPage ||
+      isQuotePage ||
+      isIntegrationsPage
+    )
+      return;
 
     const handleScroll = () => {
-      const sections = ["home", "services", "integrations", "about", "contact"];
+      const sections = ["home", "services", "about", "contact"];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -81,7 +92,7 @@ const Navigation = () => {
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isContactPage, isAboutPage, isDemoPage, isQuotePage]);
+  }, [isContactPage, isAboutPage, isDemoPage, isQuotePage, isIntegrationsPage]);
 
   const handleNavClick = (href: string) => {
     let nextKey = "";
@@ -89,6 +100,7 @@ const Navigation = () => {
     else if (href === "/about") nextKey = "about";
     else if (href === "/demo") nextKey = "demo";
     else if (href === "/quote") nextKey = "quote";
+    else if (href === "/integrations") nextKey = "integrations";
     else nextKey = href.replace("#", "");
 
     setNavUnderlineKey(nextKey);
@@ -98,7 +110,13 @@ const Navigation = () => {
       setIsOpen(false);
       return;
     }
-    if (isContactPage || isAboutPage || isDemoPage || isQuotePage) {
+    if (
+      isContactPage ||
+      isAboutPage ||
+      isDemoPage ||
+      isQuotePage ||
+      isIntegrationsPage
+    ) {
       // Always go to home page for #home, otherwise go to main page and scroll
       if (href === "#home") {
         router.push("/");
@@ -143,10 +161,13 @@ const Navigation = () => {
                 (item.href === "/contact" && navUnderlineKey === "contact") ||
                 (item.href === "/demo" && navUnderlineKey === "demo") ||
                 (item.href === "/quote" && navUnderlineKey === "quote") ||
+                (item.href === "/integrations" &&
+                  navUnderlineKey === "integrations") ||
                 (item.href !== "/about" &&
                   item.href !== "/contact" &&
                   item.href !== "/demo" &&
                   item.href !== "/quote" &&
+                  item.href !== "/integrations" &&
                   navUnderlineKey === sectionId);
 
               return (
@@ -268,6 +289,8 @@ const Navigation = () => {
               ? item.href === "/demo"
               : isQuotePage
               ? item.href === "/quote"
+              : isIntegrationsPage
+              ? item.href === "/integrations"
               : item.href === "/contact"
               ? false
               : activeSection === sectionId;

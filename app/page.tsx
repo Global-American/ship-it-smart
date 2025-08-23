@@ -13,7 +13,7 @@ export default function Home() {
       <StatsSection />
       <ServicesSection />
       <CarriersSection />
-      <IntegrationsSection />
+      {/* <IntegrationsSection /> */}
       <TestimonialsSection />
       <style jsx>{`
         @keyframes scroll {

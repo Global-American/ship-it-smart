@@ -185,27 +185,45 @@ function SimpleCheckbox({
 
 const brands = [
   {
-    id: "shipitsmart",
-    name: "ShipItSmart",
-    description: "Global Shipping Simplified",
+    id: "usDomestic",
+    name: "US Domestic",
+    description: "Optional Description",
     icon: <ShipIcon className="h-4 w-4" />,
   },
   {
-    id: "freightitsmart",
-    name: "FreightItSmart",
-    description: "Freight Management Reinvented",
+    id: "usExports",
+    name: "US Exports",
+    description: "Optional Description",
     icon: <TruckIcon className="h-4 w-4" />,
   },
   {
-    id: "returnitsmart",
-    name: "ReturnItSmart",
-    description: "Reverse Logistics Perfected",
+    id: "usImports",
+    name: "US Imports",
+    description: "Optional Description",
     icon: <RotateCcwIcon className="h-4 w-4" />,
   },
   {
-    id: "fulfillitsmart",
-    name: "FulfillItSmart",
-    description: "End-to-End Fulfillment Excellence",
+    id: "ukFinalMile",
+    name: "UK Final Mile",
+    description: "Optional Description",
+    icon: <PackageIcon className="h-4 w-4" />,
+  },
+  {
+    id: "ukExports",
+    name: "UK Exports",
+    description: "Optional Description",
+    icon: <PackageIcon className="h-4 w-4" />,
+  },
+  {
+    id: "chinaExports",
+    name: "China Exports",
+    description: "Optional Description",
+    icon: <PackageIcon className="h-4 w-4" />,
+  },
+  {
+    id: "other",
+    name: "Other",
+    description: "Optional Description",
     icon: <PackageIcon className="h-4 w-4" />,
   },
 ];
@@ -315,7 +333,10 @@ export default function ContactPage() {
               {/* Name and Company Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
                 <div className="space-y-3">
-                  <SimpleLabel htmlFor="name" className="text-base lg:text-lg">
+                  <SimpleLabel
+                    htmlFor="name"
+                    className="text-base lg:text-lg text-[#1F447B]"
+                  >
                     Full Name *
                   </SimpleLabel>
                   <SimpleInput
@@ -332,7 +353,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="company"
-                    className="text-base lg:text-lg"
+                    className="text-base lg:text-lg text-[#1F447B]"
                   >
                     Company Name
                   </SimpleLabel>
@@ -350,7 +371,10 @@ export default function ContactPage() {
               {/* Phone and Email Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
                 <div className="space-y-3">
-                  <SimpleLabel htmlFor="phone" className="text-base lg:text-lg">
+                  <SimpleLabel
+                    htmlFor="phone"
+                    className="text-base lg:text-lg text-[#1F447B]"
+                  >
                     Phone Number
                   </SimpleLabel>
                   <SimpleInput
@@ -364,7 +388,10 @@ export default function ContactPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <SimpleLabel htmlFor="email" className="text-base lg:text-lg">
+                  <SimpleLabel
+                    htmlFor="email"
+                    className="text-base lg:text-lg text-[#1F447B]"
+                  >
                     Email Address *
                   </SimpleLabel>
                   <SimpleInput
@@ -383,7 +410,7 @@ export default function ContactPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Building2Icon className="h-5 w-5" />
-                  <SimpleLabel className="text-base lg:text-lg">
+                  <SimpleLabel className="text-base lg:text-lg text-[#1F447B]">
                     Services of Interest
                   </SimpleLabel>
                 </div>
@@ -412,7 +439,7 @@ export default function ContactPage() {
                           >
                             <div className="flex items-center gap-2 mb-1">
                               <div className="text-[#EB993C]">{brand.icon}</div>
-                              <span className="font-medium text-foreground text-sm lg:text-base group-hover:text-[#EB993C] transition-colors">
+                              <span className="font-medium text-foreground text-sm lg:text-base group-hover:text-[#EB993C] text-[#1F447B] transition-colors">
                                 {brand.name}
                               </span>
                             </div>
@@ -429,7 +456,10 @@ export default function ContactPage() {
 
               {/* Message Field */}
               <div className="space-y-3">
-                <SimpleLabel htmlFor="message" className="text-base lg:text-lg">
+                <SimpleLabel
+                  htmlFor="message"
+                  className="text-base lg:text-lg text-[#1F447B]"
+                >
                   Message *
                 </SimpleLabel>
                 <SimpleTextarea
