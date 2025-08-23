@@ -1,10 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function IntegrationsPage() {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isHeaderVisible, setIsHeaderVisible] = useState(false);
+  const [isContentVisible, setIsContentVisible] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === headerRef.current && entry.isIntersecting) {
+            setIsHeaderVisible(true);
+          }
+          if (entry.target === contentRef.current && entry.isIntersecting) {
+            setIsContentVisible(true);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (headerRef.current) observer.observe(headerRef.current);
+    if (contentRef.current) observer.observe(contentRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   const categories = [
     "ALL",
@@ -26,7 +51,6 @@ export default function IntegrationsPage() {
       color: "bg-[#A8E6CF]",
       textColor: "text-[#2E7D5A]",
     },
-    // ...existing integrations data...
     {
       name: "Royal Mail",
       description:
@@ -218,7 +242,14 @@ export default function IntegrationsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="pt-20 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div
+            ref={headerRef}
+            className={`text-center mb-12 transition-all duration-700 ${
+              isHeaderVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4"
+            }`}
+          >
             <h1 className="text-4xl font-bold text-[#1F447B] mb-4">
               Our <span className="text-[#EB993C]">Integrations</span>
             </h1>
@@ -228,7 +259,15 @@ export default function IntegrationsPage() {
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div
+            ref={contentRef}
+            className={`flex flex-col lg:flex-row gap-8 transition-all duration-700 ${
+              isContentVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: "200ms" }}
+          >
             {/* Sidebar */}
             <div className="lg:w-1/4">
               <div className="bg-white rounded-2xl p-6 shadow-lg sticky top-8">
@@ -268,7 +307,15 @@ export default function IntegrationsPage() {
                 {filteredIntegrations.map((integration, index) => (
                   <div
                     key={index}
-                    className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                    className={`bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-700 cursor-pointer ${
+                      isContentVisible
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-4"
+                    }`}
+                    style={{
+                      transitionDelay: `${400 + (index % 9) * 100}ms`,
+                      transition: "all 0.7s ease-out, box-shadow 0.3s ease-out",
+                    }}
                   >
                     {/* Integration Icon */}
                     <div

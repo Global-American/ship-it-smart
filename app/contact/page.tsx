@@ -303,7 +303,7 @@ export default function ContactPage() {
     <section
       ref={sectionRef}
       id="contact"
-      className="py-20 md:py-28 lg:py-36 bg-background"
+      className="py-20 md:py-28 lg:py-36 bg-white"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
@@ -328,7 +328,7 @@ export default function ContactPage() {
           }`}
           style={{ transitionDelay: "100ms" }}
         >
-          <div className="bg-[#f6fdfe] rounded-2xl p-6 sm:p-8 lg:p-12 xl:p-16">
+          <div className="bg-[#D4E2FF] rounded-2xl p-6 sm:p-8 lg:p-12 xl:p-16">
             <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
               {/* Name and Company Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">

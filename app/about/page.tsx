@@ -1,10 +1,45 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
+
 export default function AboutPage() {
+  const [isAboutVisible, setIsAboutVisible] = useState(false);
+  const [isTeamVisible, setIsTeamVisible] = useState(false);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const teamRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === aboutRef.current && entry.isIntersecting) {
+            setIsAboutVisible(true);
+          }
+          if (entry.target === teamRef.current && entry.isIntersecting) {
+            setIsTeamVisible(true);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (aboutRef.current) observer.observe(aboutRef.current);
+    if (teamRef.current) observer.observe(teamRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section id="about" className="min-h-screen flex items-center bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+        <div
+          ref={aboutRef}
+          className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 transition-all duration-700 ${
+            isAboutVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+        >
           <div>
             <h2 className="text-4xl font-bold text-[#1F447B] mb-6">
               About <span className="text-[#EB993C]">Us</span>
@@ -39,7 +74,15 @@ export default function AboutPage() {
         </div>
 
         {/* Our Team Section */}
-        <div className="text-center">
+        <div
+          ref={teamRef}
+          className={`text-center transition-all duration-700 ${
+            isTeamVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: "100ms" }}
+        >
           <h2 className="text-4xl font-bold text-[#1F447B] mb-4">
             Our <span className="text-[#EB993C]">Team</span>
           </h2>
@@ -50,7 +93,14 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Avi Mechlowitz */}
-            <div className="text-center">
+            <div
+              className={`text-center transition-all duration-700 ${
+                isTeamVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4"
+              }`}
+              style={{ transitionDelay: "200ms" }}
+            >
               <div className="w-64 h-64 bg-gray-200 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer">
                 <svg
                   className="w-20 h-20 text-gray-400"
@@ -67,7 +117,14 @@ export default function AboutPage() {
             </div>
 
             {/* Andy Ebert */}
-            <div className="text-center">
+            <div
+              className={`text-center transition-all duration-700 ${
+                isTeamVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4"
+              }`}
+              style={{ transitionDelay: "300ms" }}
+            >
               <div className="w-64 h-64 bg-gray-200 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer">
                 <svg
                   className="w-20 h-20 text-gray-400"
@@ -84,7 +141,14 @@ export default function AboutPage() {
             </div>
 
             {/* Michael Gastwirth */}
-            <div className="text-center">
+            <div
+              className={`text-center transition-all duration-700 ${
+                isTeamVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4"
+              }`}
+              style={{ transitionDelay: "400ms" }}
+            >
               <div className="w-64 h-64 bg-gray-200 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer">
                 <svg
                   className="w-20 h-20 text-gray-400"
@@ -101,7 +165,14 @@ export default function AboutPage() {
             </div>
 
             {/* Jake Geller */}
-            <div className="text-center">
+            <div
+              className={`text-center transition-all duration-700 ${
+                isTeamVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4"
+              }`}
+              style={{ transitionDelay: "500ms" }}
+            >
               <div className="w-64 h-64 bg-gray-200 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer">
                 <svg
                   className="w-20 h-20 text-gray-400"

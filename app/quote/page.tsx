@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const COLORS = {
   primary: "#1F447B",
@@ -21,6 +21,38 @@ export default function QuotePage() {
     serviceType: "standard",
     packageType: "parcel",
   });
+
+  const [isHeaderVisible, setIsHeaderVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isBenefitsVisible, setIsBenefitsVisible] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+  const benefitsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === headerRef.current && entry.isIntersecting) {
+            setIsHeaderVisible(true);
+          }
+          if (entry.target === formRef.current && entry.isIntersecting) {
+            setIsFormVisible(true);
+          }
+          if (entry.target === benefitsRef.current && entry.isIntersecting) {
+            setIsBenefitsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (headerRef.current) observer.observe(headerRef.current);
+    if (formRef.current) observer.observe(formRef.current);
+    if (benefitsRef.current) observer.observe(benefitsRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -43,7 +75,14 @@ export default function QuotePage() {
       <div className="pt-20 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-12">
+          <div
+            ref={headerRef}
+            className={`text-center mb-12 transition-all duration-700 ${
+              isHeaderVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4"
+            }`}
+          >
             <h1 className="text-4xl font-bold text-[#1F447B] mb-4">
               Get Your <span className="text-[#EB993C]">Shipping Quote</span>
             </h1>
@@ -54,7 +93,15 @@ export default function QuotePage() {
           </div>
 
           {/* Quote Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div
+            ref={formRef}
+            className={`bg-white rounded-2xl shadow-lg p-8 transition-all duration-700 ${
+              isFormVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: "200ms" }}
+          >
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Addresses */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -217,7 +264,15 @@ export default function QuotePage() {
           </div>
 
           {/* Benefits */}
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div
+            ref={benefitsRef}
+            className={`mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-700 ${
+              isBenefitsVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: "400ms" }}
+          >
             <div className="text-center">
               <div className="w-16 h-16 bg-[#D4E2FF] rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-[#1F447B] text-2xl font-bold">£</span>
