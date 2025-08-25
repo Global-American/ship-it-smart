@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const navItems = [
   { name: "Home", href: "#home" },
@@ -26,46 +26,30 @@ const COLORS = {
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const [isContactPage, setIsContactPage] = useState(false);
-  const [isAboutPage, setIsAboutPage] = useState(false);
-  const [isDemoPage, setIsDemoPage] = useState(false);
-  const [isQuotePage, setIsQuotePage] = useState(false);
-  const [isIntegrationsPage, setIsIntegrationsPage] = useState(false);
   const [navUnderlineKey, setNavUnderlineKey] = useState("home");
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Only set isContactPage after mount to avoid hydration errors
+  // Update navigation state based on current pathname
   useEffect(() => {
-    // Use a safer check for window and pathname
-    if (typeof window !== "undefined") {
-      setIsContactPage(window.location.pathname === "/contact");
-      setIsAboutPage(window.location.pathname === "/about");
-      setIsDemoPage(window.location.pathname === "/demo");
-      setIsQuotePage(window.location.pathname === "/quote");
-      setIsIntegrationsPage(window.location.pathname === "/integrations");
-      // Set underline key based on current page
-      if (window.location.pathname === "/contact")
-        setNavUnderlineKey("contact");
-      else if (window.location.pathname === "/about")
-        setNavUnderlineKey("about");
-      else if (window.location.pathname === "/demo") setNavUnderlineKey("demo");
-      else if (window.location.pathname === "/quote")
-        setNavUnderlineKey("quote");
-      else if (window.location.pathname === "/integrations")
-        setNavUnderlineKey("integrations");
-      else setNavUnderlineKey(activeSection);
+    if (pathname === "/contact") {
+      setNavUnderlineKey("contact");
+    } else if (pathname === "/about") {
+      setNavUnderlineKey("about");
+    } else if (pathname === "/demo") {
+      setNavUnderlineKey("demo");
+    } else if (pathname === "/quote") {
+      setNavUnderlineKey("quote");
+    } else if (pathname === "/integrations") {
+      setNavUnderlineKey("integrations");
+    } else {
+      setNavUnderlineKey(activeSection);
     }
-  }, [activeSection]);
+  }, [pathname, activeSection]);
 
   useEffect(() => {
-    if (
-      isContactPage ||
-      isAboutPage ||
-      isDemoPage ||
-      isQuotePage ||
-      isIntegrationsPage
-    )
-      return;
+    // Only handle scroll on home page
+    if (pathname !== "/") return;
 
     const handleScroll = () => {
       const sections = ["home", "services", "about", "contact"];
@@ -92,40 +76,23 @@ const Navigation = () => {
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isContactPage, isAboutPage, isDemoPage, isQuotePage, isIntegrationsPage]);
+  }, [pathname]);
 
   const handleNavClick = (href: string) => {
-    let nextKey = "";
-    if (href === "/contact") nextKey = "contact";
-    else if (href === "/about") nextKey = "about";
-    else if (href === "/demo") nextKey = "demo";
-    else if (href === "/quote") nextKey = "quote";
-    else if (href === "/integrations") nextKey = "integrations";
-    else nextKey = href.replace("#", "");
-
-    setNavUnderlineKey(nextKey);
-
     if (href.startsWith("/")) {
+      // For all page routes including integrations
       router.push(href);
       setIsOpen(false);
       return;
     }
-    if (
-      isContactPage ||
-      isAboutPage ||
-      isDemoPage ||
-      isQuotePage ||
-      isIntegrationsPage
-    ) {
-      // Always go to home page for #home, otherwise go to main page and scroll
-      if (href === "#home") {
-        router.push("/");
-      } else {
-        router.push("/" + href);
-      }
+
+    if (pathname !== "/") {
+      // Navigate to home page with hash for sections
+      router.push("/" + href);
       setIsOpen(false);
       return;
     }
+
     const targetId = href.replace("#", "");
     const element = document.getElementById(targetId);
     if (element) {
@@ -135,7 +102,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <nav className="bg-white shadow-sm border-b border-gray-100 fixed top-0 left-0 right-0 z-[60] w-full">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo - Left aligned */}
@@ -155,20 +122,10 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => {
               const sectionId = item.href.replace("#", "");
-              // Use navUnderlineKey for underline animation
-              const isActive =
-                (item.href === "/about" && navUnderlineKey === "about") ||
-                (item.href === "/contact" && navUnderlineKey === "contact") ||
-                (item.href === "/demo" && navUnderlineKey === "demo") ||
-                (item.href === "/quote" && navUnderlineKey === "quote") ||
-                (item.href === "/integrations" &&
-                  navUnderlineKey === "integrations") ||
-                (item.href !== "/about" &&
-                  item.href !== "/contact" &&
-                  item.href !== "/demo" &&
-                  item.href !== "/quote" &&
-                  item.href !== "/integrations" &&
-                  navUnderlineKey === sectionId);
+              // Simplified active state logic
+              const isActive = item.href.startsWith("/")
+                ? pathname === item.href
+                : pathname === "/" && navUnderlineKey === sectionId;
 
               return (
                 <button
@@ -187,15 +144,19 @@ const Navigation = () => {
                   {item.name}
                   {isActive && (
                     <motion.span
-                      layoutId="nav-underline"
+                      key={`underline-${item.name}`}
                       className="absolute left-0 right-0 -bottom-2 h-0.5 rounded-full"
                       style={{
                         background: COLORS.primary,
                       }}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      exit={{ scaleX: 0 }}
                       transition={{
                         type: "spring",
-                        stiffness: 400,
-                        damping: 30,
+                        stiffness: 300,
+                        damping: 25,
+                        duration: 0.3,
                       }}
                     />
                   )}
@@ -281,19 +242,11 @@ const Navigation = () => {
         <div className="md:hidden px-4 pt-2 pb-3 bg-white border-t border-gray-100">
           {navItems.map((item) => {
             const sectionId = item.href.replace("#", "");
-            const isActive = isContactPage
-              ? item.href === "/contact"
-              : isAboutPage
-              ? item.href === "/about"
-              : isDemoPage
-              ? item.href === "/demo"
-              : isQuotePage
-              ? item.href === "/quote"
-              : isIntegrationsPage
-              ? item.href === "/integrations"
-              : item.href === "/contact"
-              ? false
-              : activeSection === sectionId;
+            // Simplified active state logic for mobile
+            const isActive = item.href.startsWith("/")
+              ? pathname === item.href
+              : pathname === "/" && navUnderlineKey === sectionId;
+
             return (
               <button
                 key={item.name}

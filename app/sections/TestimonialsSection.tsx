@@ -151,11 +151,6 @@ export default function TestimonialsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-block">
-            <span className="bg-[#EB993C] text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 inline-block">
-              TESTIMONIALS
-            </span>
-          </div>
           <h2 className="text-4xl md:text-5xl font-bold text-[#1F447B] mb-6">
             What Our <span className="text-[#EB993C]">Clients Say</span>
           </h2>

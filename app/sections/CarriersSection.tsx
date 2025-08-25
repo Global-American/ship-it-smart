@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function CarriersSection() {
-  const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
 
   return (
@@ -238,127 +237,15 @@ export default function CarriersSection() {
           {/* Toggle Button */}
           <div className="text-center mb-8">
             <button
-              onClick={() => setIsExpanded(!isExpanded)}
+              onClick={() => {
+                router.push("/integrations");
+              }}
               className="inline-flex items-center bg-[#EB993C] hover:bg-[#d97706] text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 group shadow-lg hover:shadow-xl cursor-pointer"
             >
               <span className="mr-3">
-                {isExpanded
-                  ? "Show Less"
-                  : "View Our Access To Additional Carriers"}
+                {"View Our Access To Additional Carriers"}
               </span>
-              <svg
-                className={`w-5 h-5 transition-transform duration-300 ${
-                  isExpanded ? "rotate-180" : "rotate-0"
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
             </button>
-          </div>
-
-          {/* Expandable Content */}
-          <div
-            className={`overflow-hidden transition-all duration-700 ease-in-out ${
-              isExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
-            }`}
-          >
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {/* USPS */}
-              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 group cursor-pointer">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-[#004B87] rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-white font-bold text-sm">USPS</span>
-                  </div>
-                  <h4 className="font-semibold text-[#1F447B] text-sm">USPS</h4>
-                  <p className="text-xs text-[#324A6D] mt-1">Postal Service</p>
-                </div>
-              </div>
-
-              {/* OnTrac */}
-              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 group cursor-pointer">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-[#E31837] rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-white font-bold text-xs">OnTrac</span>
-                  </div>
-                  <h4 className="font-semibold text-[#1F447B] text-sm">
-                    OnTrac
-                  </h4>
-                  <p className="text-xs text-[#324A6D] mt-1">
-                    Regional Delivery
-                  </p>
-                </div>
-              </div>
-
-              {/* LaserShip */}
-              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 group cursor-pointer">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-[#FF6B35] rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <svg
-                      className="w-8 h-8 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <h4 className="font-semibold text-[#1F447B] text-sm">
-                    LaserShip
-                  </h4>
-                  <p className="text-xs text-[#324A6D] mt-1">
-                    Last Mile Delivery
-                  </p>
-                </div>
-              </div>
-
-              {/* Amazon Logistics */}
-              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 group cursor-pointer">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-[#FF9900] rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-white font-bold text-xs">AMZ</span>
-                  </div>
-                  <h4 className="font-semibold text-[#1F447B] text-sm">
-                    Amazon Logistics
-                  </h4>
-                  <p className="text-xs text-[#324A6D] mt-1">Prime Delivery</p>
-                </div>
-              </div>
-
-              {/* Canada Post */}
-              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 group cursor-pointer">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-[#FF0000] rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-white font-bold text-xs">CP</span>
-                  </div>
-                  <h4 className="font-semibold text-[#1F447B] text-sm">
-                    Canada Post
-                  </h4>
-                  <p className="text-xs text-[#324A6D] mt-1">
-                    Canadian Delivery
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Call to Action */}
-            <div className="text-center mt-12">
-              <p className="text-lg text-[#324A6D] mb-6">
-                Access discounted rates from all major carriers in one platform
-              </p>
-              <button
-                onClick={() => router.push("/contact")}
-                className="bg-[#1F447B] hover:bg-[#324A6D] text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200 cursor-pointer"
-              >
-                Contact us about these rates
-              </button>
-            </div>
           </div>
         </div>
       </div>
