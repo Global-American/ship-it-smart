@@ -95,7 +95,7 @@ export default function QuotePage() {
           {/* Quote Form */}
           <div
             ref={formRef}
-            className={`bg-white rounded-2xl shadow-lg p-8 transition-all duration-700 ${
+            className={`bg-[#e6ecf7] rounded-2xl shadow-lg p-8 transition-all duration-700  border-2 border-[#1F447B] ${
               isFormVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -114,7 +114,7 @@ export default function QuotePage() {
                     name="fromPostcode"
                     value={formData.fromPostcode}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                     placeholder="SW1A 1AA"
                     required
                   />
@@ -128,7 +128,7 @@ export default function QuotePage() {
                     name="toPostcode"
                     value={formData.toPostcode}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                     placeholder="M1 1AA"
                     required
                   />
@@ -150,7 +150,7 @@ export default function QuotePage() {
                       name="weight"
                       value={formData.weight}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                       placeholder="1.5"
                       step="0.1"
                       required
@@ -165,7 +165,7 @@ export default function QuotePage() {
                       name="length"
                       value={formData.length}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                       placeholder="30"
                       required
                     />
@@ -179,7 +179,7 @@ export default function QuotePage() {
                       name="width"
                       value={formData.width}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                       placeholder="20"
                       required
                     />
@@ -193,7 +193,7 @@ export default function QuotePage() {
                       name="height"
                       value={formData.height}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                       placeholder="15"
                       required
                     />
@@ -212,7 +212,7 @@ export default function QuotePage() {
                     name="value"
                     value={formData.value}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                     placeholder="50.00"
                     step="0.01"
                   />
@@ -225,7 +225,7 @@ export default function QuotePage() {
                     name="serviceType"
                     value={formData.serviceType}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                   >
                     <option value="standard">Standard</option>
                     <option value="express">Express</option>
@@ -241,7 +241,7 @@ export default function QuotePage() {
                     name="packageType"
                     value={formData.packageType}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                   >
                     <option value="parcel">Parcel</option>
                     <option value="document">Document</option>
