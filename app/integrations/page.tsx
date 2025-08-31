@@ -278,7 +278,7 @@ export default function IntegrationsPage() {
                     placeholder="Search"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-[#F4FAFC] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent text-[#324A6D]"
                   />
                 </div>
 

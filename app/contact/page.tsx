@@ -130,7 +130,7 @@ function SimpleInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`bg-white border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md text-base lg:text-lg py-3 lg:py-4 px-4 w-full ${
+      className={`bg-[#F4FAFC] border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
         props.className ?? ""
       }`}
     />
@@ -143,7 +143,7 @@ function SimpleTextarea(
   return (
     <textarea
       {...props}
-      className={`bg-white border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md resize-none text-base lg:text-lg py-3 lg:py-4 px-4 w-full ${
+      className={`bg-[#F4FAFC] border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md resize-none text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
         props.className ?? ""
       }`}
     />
