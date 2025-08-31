@@ -31,7 +31,7 @@ export default function QuotePage() {
     dangerousGoodsCategory: "",
     requiresInsurance: false,
     insuranceValue: "",
-    insuranceCurrency: "GBP",
+    insuranceCurrency: "USD",
     measurementUnit: "metric",
   });
 
@@ -363,7 +363,7 @@ export default function QuotePage() {
                     name="dangerousGoodsCategory"
                     value={formData.dangerousGoodsCategory}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 pr-10 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                    className="w-full px-4 py-3 pr-10 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                     required={formData.dangerousGoods}
                   >
                     <option value="">Select Category</option>
@@ -394,8 +394,7 @@ export default function QuotePage() {
                         name="insuranceValue"
                         value={formData.insuranceValue}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        placeholder="1000.00"
+                        className="w-full px-4 py-3 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         step="0.01"
                         required={formData.requiresInsurance}
                       />
