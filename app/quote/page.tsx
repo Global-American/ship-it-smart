@@ -22,9 +22,9 @@ interface Package {
 export default function QuotePage() {
   const [formData, setFormData] = useState({
     fromPostcode: "",
-    fromCountry: "GB",
+    fromCountry: "US",
     toPostcode: "",
-    toCountry: "GB",
+    toCountry: "US",
     residentialAddress: false,
     requestPickup: false,
     dangerousGoods: false,
@@ -171,7 +171,7 @@ export default function QuotePage() {
                       name="fromCountry"
                       value={formData.fromCountry}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-10 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full px-4 py-3 pr-10 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     >
                       <option value="GB">United Kingdom</option>
@@ -205,8 +205,7 @@ export default function QuotePage() {
                       name="fromPostcode"
                       value={formData.fromPostcode}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      placeholder="SW1A 1AA"
+                      className="w-full px-4 py-3 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     />
                   </div>
@@ -221,7 +220,7 @@ export default function QuotePage() {
                       name="toCountry"
                       value={formData.toCountry}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-10 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full px-4 py-3 pr-10 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     >
                       <option value="GB">United Kingdom</option>
@@ -255,8 +254,7 @@ export default function QuotePage() {
                       name="toPostcode"
                       value={formData.toPostcode}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      placeholder="M1 1AA"
+                      className="w-full px-4 py-3 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     />
                   </div>
@@ -274,7 +272,7 @@ export default function QuotePage() {
                       <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
                         Residential Address
                       </label>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#EB993C] mt-1">
                         Delivery to a residential location
                       </p>
                     </div>
@@ -295,7 +293,7 @@ export default function QuotePage() {
                       <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
                         Request Pickup
                       </label>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#EB993C] mt-1">
                         Schedule a pickup from your location
                       </p>
                     </div>
@@ -316,7 +314,7 @@ export default function QuotePage() {
                       <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
                         Dangerous Goods
                       </label>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#EB993C] mt-1">
                         Contains hazardous materials
                       </p>
                     </div>
@@ -337,7 +335,7 @@ export default function QuotePage() {
                       <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
                         Requires Insurance
                       </label>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#EB993C] mt-1">
                         Add insurance coverage
                       </p>
                     </div>
@@ -545,11 +543,6 @@ export default function QuotePage() {
                               )
                             }
                             className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            placeholder={
-                              formData.measurementUnit === "metric"
-                                ? "1.5"
-                                : "3.3"
-                            }
                             step="0.1"
                             required
                           />
@@ -573,11 +566,6 @@ export default function QuotePage() {
                               )
                             }
                             className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            placeholder={
-                              formData.measurementUnit === "metric"
-                                ? "30"
-                                : "12"
-                            }
                             required
                           />
                         </div>
@@ -600,9 +588,6 @@ export default function QuotePage() {
                               )
                             }
                             className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            placeholder={
-                              formData.measurementUnit === "metric" ? "20" : "8"
-                            }
                             required
                           />
                         </div>
@@ -625,9 +610,6 @@ export default function QuotePage() {
                               )
                             }
                             className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            placeholder={
-                              formData.measurementUnit === "metric" ? "15" : "6"
-                            }
                             required
                           />
                         </div>
@@ -641,7 +623,7 @@ export default function QuotePage() {
                   <button
                     type="button"
                     onClick={addPackage}
-                    className="bg-[#1F447B] hover:bg-[#1a3a6b] text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                    className="bg-[#1F447B] hover:bg-[#1a3a6b] text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2 border-2 border-[#EB993C]"
                   >
                     <span className="text-lg">+</span>
                     Add Another Package
@@ -653,7 +635,7 @@ export default function QuotePage() {
               <div className="text-center">
                 <button
                   type="submit"
-                  className="bg-[#EB993C] hover:bg-[#d4822a] text-white font-semibold px-12 py-4 rounded-lg text-lg transition-colors duration-200"
+                  className="bg-[#EB993C] hover:bg-[#d4822a] text-white font-semibold px-12 py-4 rounded-lg text-lg transition-colors duration-200 border-2 border-[#1F447B]"
                 >
                   Get Quote
                 </button>
