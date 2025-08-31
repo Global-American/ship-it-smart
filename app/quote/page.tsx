@@ -407,7 +407,7 @@ export default function QuotePage() {
                         name="insuranceCurrency"
                         value={formData.insuranceCurrency}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 pr-10 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        className="w-full px-4 py-3 pr-10 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         required={formData.requiresInsurance}
                       >
                         <option value="GBP">GBP - British Pound</option>
