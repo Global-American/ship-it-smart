@@ -128,8 +128,8 @@ const Footer = () => {
 
           {/* Map */}
           <div className="col-span-1">
-            <div className="w-full h-40 bg-gray-200 rounded-lg overflow-hidden">
-              <iframe
+            <div className="w-full h-full  rounded-lg overflow-hidden flex items-center justify-center">
+              {/* <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3048.4!2d-74.0!3d40.7!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQyJzAwLjAiTiA3NMKwMDAnMDAuMCJX!5e0!3m2!1sen!2sus!4v1234567890"
                 width="100%"
                 height="100%"
@@ -138,7 +138,14 @@ const Footer = () => {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Birch Industrial Estate Location"
-              ></iframe>
+              ></iframe> */}
+              <Image
+                src="/shipItSmartIcon.png"
+                alt="ShipItSmart Icon"
+                width={200}
+                height={200}
+                style={{ objectFit: "contain" }}
+              />
             </div>
           </div>
         </div>
