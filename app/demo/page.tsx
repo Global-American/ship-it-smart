@@ -24,10 +24,7 @@ export default function DemoPage() {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="py-20 md:py-28 lg:py-36 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen"
-    >
+    <section ref={sectionRef} className="py-20 md:py-28 lg:py-3 min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div
