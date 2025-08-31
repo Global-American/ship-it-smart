@@ -12,7 +12,9 @@ const COLORS = {
 export default function QuotePage() {
   const [formData, setFormData] = useState({
     fromPostcode: "",
+    fromCountry: "GB",
     toPostcode: "",
+    toCountry: "GB",
     weight: "",
     length: "",
     width: "",
@@ -105,33 +107,105 @@ export default function QuotePage() {
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Addresses */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                    From Postcode
-                  </label>
-                  <input
-                    type="text"
-                    name="fromPostcode"
-                    value={formData.fromPostcode}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
-                    placeholder="SW1A 1AA"
-                    required
-                  />
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-[#1F447B]">From</h4>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Country
+                    </label>
+                    <select
+                      name="fromCountry"
+                      value={formData.fromCountry}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 pr-10 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
+                      required
+                    >
+                      <option value="GB">United Kingdom</option>
+                      <option value="US">United States</option>
+                      <option value="CA">Canada</option>
+                      <option value="AU">Australia</option>
+                      <option value="DE">Germany</option>
+                      <option value="FR">France</option>
+                      <option value="IT">Italy</option>
+                      <option value="ES">Spain</option>
+                      <option value="NL">Netherlands</option>
+                      <option value="BE">Belgium</option>
+                      <option value="CH">Switzerland</option>
+                      <option value="AT">Austria</option>
+                      <option value="IE">Ireland</option>
+                      <option value="DK">Denmark</option>
+                      <option value="SE">Sweden</option>
+                      <option value="NO">Norway</option>
+                      <option value="FI">Finland</option>
+                      <option value="PL">Poland</option>
+                      <option value="CZ">Czech Republic</option>
+                      <option value="HU">Hungary</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Postcode
+                    </label>
+                    <input
+                      type="text"
+                      name="fromPostcode"
+                      value={formData.fromPostcode}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
+                      placeholder="SW1A 1AA"
+                      required
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                    To Postcode
-                  </label>
-                  <input
-                    type="text"
-                    name="toPostcode"
-                    value={formData.toPostcode}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
-                    placeholder="M1 1AA"
-                    required
-                  />
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-[#1F447B]">To</h4>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Country
+                    </label>
+                    <select
+                      name="toCountry"
+                      value={formData.toCountry}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 pr-10 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
+                      required
+                    >
+                      <option value="GB">United Kingdom</option>
+                      <option value="US">United States</option>
+                      <option value="CA">Canada</option>
+                      <option value="AU">Australia</option>
+                      <option value="DE">Germany</option>
+                      <option value="FR">France</option>
+                      <option value="IT">Italy</option>
+                      <option value="ES">Spain</option>
+                      <option value="NL">Netherlands</option>
+                      <option value="BE">Belgium</option>
+                      <option value="CH">Switzerland</option>
+                      <option value="AT">Austria</option>
+                      <option value="IE">Ireland</option>
+                      <option value="DK">Denmark</option>
+                      <option value="SE">Sweden</option>
+                      <option value="NO">Norway</option>
+                      <option value="FI">Finland</option>
+                      <option value="PL">Poland</option>
+                      <option value="CZ">Czech Republic</option>
+                      <option value="HU">Hungary</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Postcode
+                    </label>
+                    <input
+                      type="text"
+                      name="toPostcode"
+                      value={formData.toPostcode}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
+                      placeholder="M1 1AA"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -225,7 +299,7 @@ export default function QuotePage() {
                     name="serviceType"
                     value={formData.serviceType}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
+                    className="w-full px-4 py-3 pr-10 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                   >
                     <option value="standard">Standard</option>
                     <option value="express">Express</option>
@@ -241,7 +315,7 @@ export default function QuotePage() {
                     name="packageType"
                     value={formData.packageType}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
+                    className="w-full px-4 py-3 pr-10 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all"
                   >
                     <option value="parcel">Parcel</option>
                     <option value="document">Document</option>
