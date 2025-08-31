@@ -8,7 +8,7 @@ interface LayoutClientProps {
 }
 
 export default function LayoutClient({ children }: LayoutClientProps) {
-  const [backgroundColor, setBackgroundColor] = useState("#f3f4f6");
+  const [backgroundColor, setBackgroundColor] = useState("#F4FAFC");
 
   useEffect(() => {
     const savedColor = localStorage.getItem("shipItSmart-backgroundColor");
