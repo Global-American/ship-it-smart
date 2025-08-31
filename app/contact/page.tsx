@@ -325,7 +325,7 @@ export default function ContactPage() {
           }`}
           style={{ transitionDelay: "100ms" }}
         >
-          <div className="bg-[#CFDEFA] rounded-2xl p-6 sm:p-8 lg:p-12 xl:p-16">
+          <div className="bg-[#DFE7F7] rounded-2xl p-6 sm:p-8 lg:p-12 xl:p-16">
             <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
               {/* Name and Company Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
