@@ -300,11 +300,7 @@ export default function ContactPage() {
   };
 
   return (
-    <section
-      ref={sectionRef}
-      id="contact"
-      className="py-20 md:py-28 lg:py-36 bg-white"
-    >
+    <section ref={sectionRef} id="contact" className="py-20 md:py-28 lg:py-36">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div
