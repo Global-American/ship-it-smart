@@ -332,7 +332,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="name"
-                    className="text-base lg:text-lg text-[#1F447B]"
+                    className="text-base lg:text-lg text-white"
                   >
                     Full Name *
                   </SimpleLabel>
@@ -350,7 +350,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="company"
-                    className="text-base lg:text-lg text-[#1F447B]"
+                    className="text-base lg:text-lg text-white"
                   >
                     Company Name
                   </SimpleLabel>
@@ -370,7 +370,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="phone"
-                    className="text-base lg:text-lg text-[#1F447B]"
+                    className="text-base lg:text-lg text-white"
                   >
                     Phone Number
                   </SimpleLabel>
@@ -387,7 +387,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="email"
-                    className="text-base lg:text-lg text-[#1F447B]"
+                    className="text-base lg:text-lg text-white"
                   >
                     Email Address *
                   </SimpleLabel>
@@ -455,7 +455,7 @@ export default function ContactPage() {
               <div className="space-y-3">
                 <SimpleLabel
                   htmlFor="message"
-                  className="text-base lg:text-lg text-[#1F447B]"
+                  className="text-base lg:text-lg text-white"
                 >
                   Message *
                 </SimpleLabel>
