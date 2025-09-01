@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import ColorPicker from "../components/ColorPicker";
 
 export default function AboutPage() {
   const [isAboutVisible, setIsAboutVisible] = useState(false);
   const [isTeamVisible, setIsTeamVisible] = useState(false);
+  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [containerColor, setContainerColor] = useState("#ffffff");
   const aboutRef = useRef<HTMLDivElement>(null);
   const teamRef = useRef<HTMLDivElement>(null);
 
@@ -30,18 +33,28 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <section id="about" className="min-h-screen flex items-center">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+    <section
+      id="about"
+      className="py-20 md:py-28 lg:py-36"
+      style={{ backgroundColor: bgColor }}
+    >
+      <ColorPicker
+        onColorChange={setBgColor}
+        onContainerColorChange={setContainerColor}
+        currentColor={bgColor}
+        currentContainerColor={containerColor}
+      />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div
           ref={aboutRef}
-          className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 transition-all duration-700 ${
+          className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 lg:mb-20 transition-all duration-700 ${
             isAboutVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-4"
           }`}
         >
           <div>
-            <h2 className="text-4xl font-bold text-[#1F447B] mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1F447B] mb-6">
               About <span className="text-[#EB993C]">Us</span>
             </h2>
             <p className="text-lg text-[#324A6D] mb-6">
@@ -67,7 +80,10 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="flex justify-center">
-            <div className="w-full max-w-md h-96 bg-[#D4E2FF] rounded-lg flex items-center justify-center">
+            <div
+              className="w-full max-w-md h-96 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: containerColor }}
+            >
               <span className="text-[#1F447B] text-lg">About Us Image</span>
             </div>
           </div>
@@ -83,7 +99,7 @@ export default function AboutPage() {
           }`}
           style={{ transitionDelay: "100ms" }}
         >
-          <h2 className="text-4xl font-bold text-[#1F447B] mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#1F447B] mb-4">
             Our <span className="text-[#EB993C]">Team</span>
           </h2>
           <p className="text-lg text-[#324A6D] mb-12 max-w-4xl mx-auto">
@@ -101,7 +117,10 @@ export default function AboutPage() {
               }`}
               style={{ transitionDelay: "200ms" }}
             >
-              <div className="w-64 h-64 bg-gray-200 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer">
+              <div
+                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                style={{ backgroundColor: containerColor }}
+              >
                 <svg
                   className="w-20 h-20 text-gray-400"
                   fill="currentColor"
@@ -125,7 +144,10 @@ export default function AboutPage() {
               }`}
               style={{ transitionDelay: "300ms" }}
             >
-              <div className="w-64 h-64 bg-gray-200 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer">
+              <div
+                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                style={{ backgroundColor: containerColor }}
+              >
                 <svg
                   className="w-20 h-20 text-gray-400"
                   fill="currentColor"
@@ -149,7 +171,10 @@ export default function AboutPage() {
               }`}
               style={{ transitionDelay: "400ms" }}
             >
-              <div className="w-64 h-64 bg-gray-200 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer">
+              <div
+                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                style={{ backgroundColor: containerColor }}
+              >
                 <svg
                   className="w-20 h-20 text-gray-400"
                   fill="currentColor"
@@ -173,7 +198,10 @@ export default function AboutPage() {
               }`}
               style={{ transitionDelay: "500ms" }}
             >
-              <div className="w-64 h-64 bg-gray-200 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer">
+              <div
+                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                style={{ backgroundColor: containerColor }}
+              >
                 <svg
                   className="w-20 h-20 text-gray-400"
                   fill="currentColor"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import ColorPicker from "../components/ColorPicker";
 
 // Custom SVG icons
 function ShipIcon(props: { className?: string }) {
@@ -109,7 +110,7 @@ function SimpleButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
-      className={`bg-[#EB993C] hover:bg-[#d97706] text-white font-semibold rounded-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-8 lg:px-12 py-4 lg:py-5 text-lg lg:text-xl ${
+      className={`bg-[#EB993C] hover:bg-[#d97706] text-white font-semibold rounded-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-8 lg:px-12 py-4 lg:py-5 text-lg lg:text-xl border-2 border-[#1F447B] ${
         props.className ?? ""
       }`}
     >
@@ -239,6 +240,8 @@ export default function ContactPage() {
     message: "",
     selectedBrands: [] as string[],
   });
+  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [containerColor, setContainerColor] = useState("#e6ecf7");
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -300,7 +303,18 @@ export default function ContactPage() {
   };
 
   return (
-    <section ref={sectionRef} id="contact" className="py-20 md:py-28 lg:py-36">
+    <section
+      ref={sectionRef}
+      id="contact"
+      className="py-20 md:py-28 lg:py-36"
+      style={{ backgroundColor: bgColor }}
+    >
+      <ColorPicker
+        onColorChange={setBgColor}
+        onContainerColorChange={setContainerColor}
+        currentColor={bgColor}
+        currentContainerColor={containerColor}
+      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div
@@ -325,7 +339,10 @@ export default function ContactPage() {
           }`}
           style={{ transitionDelay: "100ms" }}
         >
-          <div className="bg-[#e6ecf7] rounded-2xl p-6 sm:p-8 lg:p-12 xl:p-16 border-2 border-[#1F447B]">
+          <div
+            className="rounded-2xl p-6 sm:p-8 lg:p-12 xl:p-16 border-2 border-[#1F447B]"
+            style={{ backgroundColor: containerColor }}
+          >
             <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
               {/* Name and Company Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
@@ -479,10 +496,7 @@ export default function ContactPage() {
                       Sending...
                     </>
                   ) : (
-                    <>
-                      <SendIcon className="h-4 w-4 mr-2 inline-block" />
-                      Send Message
-                    </>
+                    <>Send Message</>
                   )}
                 </SimpleButton>
               </div>

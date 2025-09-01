@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import ColorPicker from "../components/ColorPicker";
 
 export default function DemoPage() {
   const [isVisible, setIsVisible] = useState(false);
+  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [containerColor, setContainerColor] = useState("#ffffff");
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -24,11 +27,21 @@ export default function DemoPage() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-28 lg:py-3 min-h-screen">
+    <section
+      ref={sectionRef}
+      className="py-20 md:py-28 lg:py-36"
+      style={{ backgroundColor: bgColor }}
+    >
+      <ColorPicker
+        onColorChange={setBgColor}
+        onContainerColorChange={setContainerColor}
+        currentColor={bgColor}
+        currentContainerColor={containerColor}
+      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div
-          className={`text-center mb-12 lg:mb-16 transition-all duration-700 ${
+          className={`text-center mb-12 lg:mb-20 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
@@ -37,10 +50,10 @@ export default function DemoPage() {
               LIVE DEMO
             </span>
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1F447B] mb-6">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1F447B] mb-6">
             Experience <span className="text-[#EB993C]">Ship It Smart</span>
           </h1>
-          <p className="text-xl text-[#324A6D] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-[#324A6D] max-w-3xl mx-auto leading-relaxed">
             Take a guided tour through our platform and discover how Ship It
             Smart can revolutionize your shipping workflow. No signup required.
           </p>
@@ -53,7 +66,10 @@ export default function DemoPage() {
           }`}
           style={{ transitionDelay: "200ms" }}
         >
-          <div className="bg-white rounded-3xl shadow-2xl p-4 md:p-8 border border-gray-200 relative overflow-hidden">
+          <div
+            className="rounded-3xl shadow-2xl p-4 md:p-8 border border-gray-200 relative overflow-hidden"
+            style={{ backgroundColor: containerColor }}
+          >
             {/* Background Pattern */}
             <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
               <div className="w-full h-full bg-[#EB993C] rounded-bl-full"></div>
@@ -190,7 +206,10 @@ export default function DemoPage() {
           }`}
           style={{ transitionDelay: "400ms" }}
         >
-          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto border border-gray-200">
+          <div
+            className="rounded-2xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto border border-gray-200"
+            style={{ backgroundColor: containerColor }}
+          >
             <h2 className="text-3xl font-bold text-[#1F447B] mb-4">
               Ready to Get Started?
             </h2>

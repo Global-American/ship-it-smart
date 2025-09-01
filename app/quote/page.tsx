@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import ColorPicker from "../components/ColorPicker";
 
 const COLORS = {
   primary: "#1F447B",
@@ -50,6 +51,8 @@ export default function QuotePage() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isBenefitsVisible, setIsBenefitsVisible] = useState(false);
+  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [containerColor, setContainerColor] = useState("#e6ecf7");
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useRef<HTMLDivElement>(null);
@@ -127,38 +130,52 @@ export default function QuotePage() {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="pt-20 pb-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div
-            ref={headerRef}
-            className={`text-center mb-12 transition-all duration-700 ${
-              isHeaderVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-          >
-            <h1 className="text-4xl font-bold text-[#1F447B] mb-4">
-              Get Your <span className="text-[#EB993C]">Shipping Quote</span>
-            </h1>
-            <p className="text-lg text-[#324A6D] max-w-2xl mx-auto">
-              Compare shipping rates from multiple carriers and find the best
-              option for your needs.
-            </p>
-          </div>
+    <section
+      className="py-20 md:py-28 lg:py-36"
+      style={{ backgroundColor: bgColor }}
+    >
+      <ColorPicker
+        onColorChange={setBgColor}
+        onContainerColorChange={setContainerColor}
+        currentColor={bgColor}
+        currentContainerColor={containerColor}
+      />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div
+          ref={headerRef}
+          className={`text-center mb-12 lg:mb-20 transition-all duration-700 ${
+            isHeaderVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+        >
+          <h1 className="text-3xl md:text-4xl font-bold text-[#1F447B] mb-4">
+            Get Your <span className="text-[#EB993C]">Shipping Quote</span>
+          </h1>
+          <p className="text-lg text-[#324A6D] max-w-2xl mx-auto">
+            Compare shipping rates from multiple carriers and find the best
+            option for your needs.
+          </p>
+        </div>
 
-          {/* Quote Form */}
+        {/* Quote Form */}
+        <div
+          className={`max-w-5xl lg:max-w-6xl mx-auto transition-all duration-700 ${
+            isFormVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: "200ms" }}
+        >
           <div
             ref={formRef}
-            className={`bg-[#e6ecf7] rounded-2xl shadow-lg p-8 transition-all duration-700  border-2 border-[#1F447B] ${
-              isFormVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-            style={{ transitionDelay: "200ms" }}
+            className="rounded-2xl shadow-lg p-6 sm:p-8 lg:p-12 xl:p-16 border-2 border-[#1F447B]"
+            style={{
+              backgroundColor: containerColor,
+            }}
           >
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
               {/* Addresses */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
@@ -641,56 +658,56 @@ export default function QuotePage() {
               </div>
             </form>
           </div>
+        </div>
 
-          {/* Benefits */}
-          <div
-            ref={benefitsRef}
-            className={`mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-700 ${
-              isBenefitsVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-            style={{ transitionDelay: "400ms" }}
-          >
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#1F447B] text-2xl font-bold">£</span>
-              </div>
-              <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-                Best Rates
-              </h3>
-              <p className="text-[#324A6D]">
-                Compare prices from multiple carriers to find the most
-                competitive shipping rates.
-              </p>
+        {/* Benefits */}
+        <div
+          ref={benefitsRef}
+          className={`mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-700 ${
+            isBenefitsVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: "400ms" }}
+        >
+          <div className="text-center">
+            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-[#1F447B] text-2xl font-bold">£</span>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#1F447B] text-2xl font-bold">⚡</span>
-              </div>
-              <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-                Instant Quotes
-              </h3>
-              <p className="text-[#324A6D]">
-                Get real-time shipping quotes in seconds with our advanced
-                pricing engine.
-              </p>
+            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
+              Best Rates
+            </h3>
+            <p className="text-[#324A6D]">
+              Compare prices from multiple carriers to find the most competitive
+              shipping rates.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-[#1F447B] text-2xl font-bold">⚡</span>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#1F447B] text-2xl font-bold">📦</span>
-              </div>
-              <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-                Multiple Carriers
-              </h3>
-              <p className="text-[#324A6D]">
-                Choose from Royal Mail, DPD, UPS, FedEx, DHL and many more
-                carriers.
-              </p>
+            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
+              Instant Quotes
+            </h3>
+            <p className="text-[#324A6D]">
+              Get real-time shipping quotes in seconds with our advanced pricing
+              engine.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-[#1F447B] text-2xl font-bold">📦</span>
             </div>
+            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
+              Multiple Carriers
+            </h3>
+            <p className="text-[#324A6D]">
+              Choose from Royal Mail, DPD, UPS, FedEx, DHL and many more
+              carriers.
+            </p>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

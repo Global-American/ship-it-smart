@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import ColorPicker from "../components/ColorPicker";
 
 export default function IntegrationsPage() {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const [isContentVisible, setIsContentVisible] = useState(false);
+  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [containerColor, setContainerColor] = useState("#ffffff");
   const headerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -239,119 +242,130 @@ export default function IntegrationsPage() {
   });
 
   return (
-    <div className="min-h-screen">
-      <div className="pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            ref={headerRef}
-            className={`text-center mb-12 transition-all duration-700 ${
-              isHeaderVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-          >
-            <h1 className="text-4xl font-bold text-[#1F447B] mb-4">
-              Our <span className="text-[#EB993C]">Integrations</span>
-            </h1>
-            <p className="text-lg text-[#324A6D] max-w-3xl mx-auto">
-              Connect Ship It Smart with your existing tools and platforms to
-              streamline your shipping workflow.
-            </p>
-          </div>
+    <section
+      className="py-20 md:py-28 lg:py-36"
+      style={{ backgroundColor: bgColor }}
+    >
+      <ColorPicker
+        onColorChange={setBgColor}
+        onContainerColorChange={setContainerColor}
+        currentColor={bgColor}
+        currentContainerColor={containerColor}
+      />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          ref={headerRef}
+          className={`text-center mb-12 lg:mb-20 transition-all duration-700 ${
+            isHeaderVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+        >
+          <h1 className="text-3xl md:text-4xl font-bold text-[#1F447B] mb-4">
+            Our <span className="text-[#EB993C]">Integrations</span>
+          </h1>
+          <p className="text-lg text-[#324A6D] max-w-3xl mx-auto">
+            Connect Ship It Smart with your existing tools and platforms to
+            streamline your shipping workflow.
+          </p>
+        </div>
 
-          <div
-            ref={contentRef}
-            className={`flex flex-col lg:flex-row gap-8 transition-all duration-700 ${
-              isContentVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-            style={{ transitionDelay: "200ms" }}
-          >
-            {/* Sidebar */}
-            <div className="lg:w-1/4">
-              <div className="bg-white rounded-2xl p-6 shadow-lg sticky top-8">
-                {/* Search */}
-                <div className="mb-8">
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#F4FAFC] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent text-[#324A6D]"
-                  />
-                </div>
-
-                {/* Categories */}
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-medium ${
-                        selectedCategory === category
-                          ? "bg-[#EB993C] text-white"
-                          : "text-[#324A6D] hover:bg-gray-100"
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
+        <div
+          ref={contentRef}
+          className={`flex flex-col lg:flex-row gap-8 transition-all duration-700 ${
+            isContentVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: "200ms" }}
+        >
+          {/* Sidebar */}
+          <div className="lg:w-1/4">
+            <div
+              className="rounded-2xl p-6 shadow-lg sticky top-8"
+              style={{ backgroundColor: containerColor }}
+            >
+              {/* Search */}
+              <div className="mb-8">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-3 bg-[#F4FAFC] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent text-[#324A6D]"
+                />
               </div>
-            </div>
 
-            {/* Main Content */}
-            <div className="lg:w-3/4">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredIntegrations.map((integration, index) => (
-                  <div
-                    key={index}
-                    className={`bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-700 cursor-pointer ${
-                      isContentVisible
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-4"
+              {/* Categories */}
+              <div className="space-y-2">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-medium ${
+                      selectedCategory === category
+                        ? "bg-[#EB993C] text-white"
+                        : "text-[#324A6D] hover:bg-gray-100"
                     }`}
-                    style={{
-                      transitionDelay: `${400 + (index % 9) * 100}ms`,
-                      transition: "all 0.7s ease-out, box-shadow 0.3s ease-out",
-                    }}
                   >
-                    {/* Integration Icon */}
-                    <div
-                      className={`w-16 h-16 ${integration.color} rounded-xl flex items-center justify-center mb-4`}
-                    >
-                      <span
-                        className={`${integration.textColor} font-bold text-sm`}
-                      >
-                        {integration.name === "API"
-                          ? "</>"
-                          : integration.name.split(" ")[0]}
-                      </span>
-                    </div>
-
-                    {/* Integration Info */}
-                    <h3 className="text-xl font-bold text-[#1F447B] mb-2">
-                      {integration.name}
-                    </h3>
-                    <p className="text-[#324A6D] text-sm leading-relaxed">
-                      {integration.description}
-                    </p>
-                  </div>
+                    {category}
+                  </button>
                 ))}
               </div>
+            </div>
+          </div>
 
-              {filteredIntegrations.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-[#324A6D] text-lg">
-                    No integrations found matching your criteria.
+          {/* Main Content */}
+          <div className="lg:w-3/4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredIntegrations.map((integration, index) => (
+                <div
+                  key={index}
+                  className={`border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-700 cursor-pointer ${
+                    isContentVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-4"
+                  }`}
+                  style={{
+                    transitionDelay: `${400 + (index % 9) * 100}ms`,
+                    transition: "all 0.7s ease-out, box-shadow 0.3s ease-out",
+                    backgroundColor: containerColor,
+                  }}
+                >
+                  {/* Integration Icon */}
+                  <div
+                    className={`w-16 h-16 ${integration.color} rounded-xl flex items-center justify-center mb-4`}
+                  >
+                    <span
+                      className={`${integration.textColor} font-bold text-sm`}
+                    >
+                      {integration.name === "API"
+                        ? "</>"
+                        : integration.name.split(" ")[0]}
+                    </span>
+                  </div>
+
+                  {/* Integration Info */}
+                  <h3 className="text-xl font-bold text-[#1F447B] mb-2">
+                    {integration.name}
+                  </h3>
+                  <p className="text-[#324A6D] text-sm leading-relaxed">
+                    {integration.description}
                   </p>
                 </div>
-              )}
+              ))}
             </div>
+
+            {filteredIntegrations.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-[#324A6D] text-lg">
+                  No integrations found matching your criteria.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
