@@ -130,7 +130,7 @@ function SimpleInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`bg-[#F4FAFC] border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
+      className={`bg-white border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
         props.className ?? ""
       }`}
     />
@@ -143,7 +143,7 @@ function SimpleTextarea(
   return (
     <textarea
       {...props}
-      className={`bg-[#F4FAFC] border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md resize-none text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
+      className={`bg-white border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md resize-none text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
         props.className ?? ""
       }`}
     />
@@ -332,7 +332,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="name"
-                    className="text-base lg:text-lg text-white"
+                    className="text-base lg:text-lg text-[#1F447B]"
                   >
                     Full Name *
                   </SimpleLabel>
@@ -350,7 +350,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="company"
-                    className="text-base lg:text-lg text-white"
+                    className="text-base lg:text-lg text-[#1F447B]"
                   >
                     Company Name
                   </SimpleLabel>
@@ -370,7 +370,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="phone"
-                    className="text-base lg:text-lg text-white"
+                    className="text-base lg:text-lg text-[#1F447B]"
                   >
                     Phone Number
                   </SimpleLabel>
@@ -387,7 +387,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <SimpleLabel
                     htmlFor="email"
-                    className="text-base lg:text-lg text-white"
+                    className="text-base lg:text-lg text-[#1F447B]"
                   >
                     Email Address *
                   </SimpleLabel>
@@ -455,7 +455,7 @@ export default function ContactPage() {
               <div className="space-y-3">
                 <SimpleLabel
                   htmlFor="message"
-                  className="text-base lg:text-lg text-white"
+                  className="text-base lg:text-lg text-[#1F447B]"
                 >
                   Message *
                 </SimpleLabel>
