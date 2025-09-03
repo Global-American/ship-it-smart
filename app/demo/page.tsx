@@ -5,7 +5,7 @@ import ColorPicker from "../components/ColorPicker";
 
 export default function DemoPage() {
   const [isVisible, setIsVisible] = useState(false);
-  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [bgColor, setBgColor] = useState("#F4FAFC");
   const [containerColor, setContainerColor] = useState("#ffffff");
   const sectionRef = useRef<HTMLElement>(null);
 

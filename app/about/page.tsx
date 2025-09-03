@@ -6,7 +6,7 @@ import ColorPicker from "../components/ColorPicker";
 export default function AboutPage() {
   const [isAboutVisible, setIsAboutVisible] = useState(false);
   const [isTeamVisible, setIsTeamVisible] = useState(false);
-  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [bgColor, setBgColor] = useState("#F4FAFC");
   const [containerColor, setContainerColor] = useState("#ffffff");
   const aboutRef = useRef<HTMLDivElement>(null);
   const teamRef = useRef<HTMLDivElement>(null);

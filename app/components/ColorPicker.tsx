@@ -16,13 +16,13 @@ export default function ColorPicker({
   currentContainerColor,
 }: ColorPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [customColor, setCustomColor] = useState("#4287f5");
+  const [customColor, setCustomColor] = useState("#F4FAFC");
   const [customContainerColor, setCustomContainerColor] = useState("#e6ecf7");
   const [hexInput, setHexInput] = useState("");
   const [containerHexInput, setContainerHexInput] = useState("");
 
   const presetColors = [
-    "#f3f4f6", // Default gray-50
+    "#F4FAFC", // Default
     "#fef3c7", // Warm yellow
     "#e0e7ff", // Light blue
     "#ecfdf5", // Light green

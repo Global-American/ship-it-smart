@@ -173,7 +173,7 @@ const Navigation = () => {
               <button
                 className="font-medium rounded-full px-8 py-2.5 text-base transition-colors duration-200 border-2"
                 style={{
-                  borderColor: COLORS.accent,
+                  borderColor: COLORS.primary,
                   color: "#fff",
                   background: COLORS.accent,
                   cursor: "pointer",
@@ -270,7 +270,7 @@ const Navigation = () => {
             <button
               className="w-full mt-2 font-medium rounded-full px-2 py-2 text-base transition-colors duration-200 border-2"
               style={{
-                borderColor: COLORS.accent,
+                borderColor: COLORS.primary,
                 color: "#fff",
                 background: COLORS.accent,
               }}

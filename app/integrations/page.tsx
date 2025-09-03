@@ -8,7 +8,7 @@ export default function IntegrationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const [isContentVisible, setIsContentVisible] = useState(false);
-  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [bgColor, setBgColor] = useState("#F4FAFC");
   const [containerColor, setContainerColor] = useState("#ffffff");
   const headerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);

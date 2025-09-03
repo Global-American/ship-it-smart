@@ -131,7 +131,7 @@ function SimpleInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`bg-white border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
+      className={`bg-white border-2 border-[#1F447B] focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
         props.className ?? ""
       }`}
     />
@@ -144,7 +144,7 @@ function SimpleTextarea(
   return (
     <textarea
       {...props}
-      className={`bg-white border border-gray-200 focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md resize-none text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
+      className={`bg-white border-2 border-[#1F447B] focus:border-[#EB993C] focus:ring-[#EB993C] rounded-md resize-none text-base lg:text-lg py-3 lg:py-4 px-4 w-full text-[#324A6D] ${
         props.className ?? ""
       }`}
     />
@@ -240,7 +240,7 @@ export default function ContactPage() {
     message: "",
     selectedBrands: [] as string[],
   });
-  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [bgColor, setBgColor] = useState("#F4FAFC");
   const [containerColor, setContainerColor] = useState("#e6ecf7");
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -436,7 +436,7 @@ export default function ContactPage() {
                   {brands.map((brand) => (
                     <div
                       key={brand.id}
-                      className="group relative bg-white rounded-xl border border-gray-200 p-4 hover:border-[#EB993C]/30 hover:shadow-sm transition-all duration-200"
+                      className="group relative bg-white rounded-xl border-2 border-[#1F447B] p-4 hover:border-[#EB993C]/30 hover:shadow-sm transition-all duration-200"
                     >
                       <div className="flex items-start space-x-3">
                         <SimpleCheckbox

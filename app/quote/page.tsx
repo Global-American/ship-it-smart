@@ -51,7 +51,7 @@ export default function QuotePage() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isBenefitsVisible, setIsBenefitsVisible] = useState(false);
-  const [bgColor, setBgColor] = useState("#f3f4f6");
+  const [bgColor, setBgColor] = useState("#F4FAFC");
   const [containerColor, setContainerColor] = useState("#e6ecf7");
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
@@ -188,7 +188,7 @@ export default function QuotePage() {
                       name="fromCountry"
                       value={formData.fromCountry}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-10 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full px-4 py-3 pr-10 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     >
                       <option value="GB">United Kingdom</option>
@@ -222,7 +222,7 @@ export default function QuotePage() {
                       name="fromPostcode"
                       value={formData.fromPostcode}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     />
                   </div>
@@ -237,7 +237,7 @@ export default function QuotePage() {
                       name="toCountry"
                       value={formData.toCountry}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-10 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full px-4 py-3 pr-10 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     >
                       <option value="GB">United Kingdom</option>
@@ -271,7 +271,7 @@ export default function QuotePage() {
                       name="toPostcode"
                       value={formData.toPostcode}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     />
                   </div>
@@ -380,7 +380,7 @@ export default function QuotePage() {
                     name="dangerousGoodsCategory"
                     value={formData.dangerousGoodsCategory}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 pr-10 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                    className="w-full px-4 py-3 pr-10 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                     required={formData.dangerousGoods}
                   >
                     <option value="">Select Category</option>
@@ -388,7 +388,7 @@ export default function QuotePage() {
                     <option value="DRY_ICE">DRY_ICE | Dry Ice</option>
                     <option value="LITHIUM">LITHIUM | Lithium Battery</option>
                   </select>
-                  <p className="text-xs text-gray-600 mt-2 italic">
+                  <p className="text-xs text-[#EB993C] mt-2 italic">
                     Further documentation will be required prior to completion
                     of shipment.
                   </p>
@@ -411,7 +411,7 @@ export default function QuotePage() {
                         name="insuranceValue"
                         value={formData.insuranceValue}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         step="0.01"
                         required={formData.requiresInsurance}
                       />
@@ -424,7 +424,7 @@ export default function QuotePage() {
                         name="insuranceCurrency"
                         value={formData.insuranceCurrency}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 pr-10 bg-white border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        className="w-full px-4 py-3 pr-10 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         required={formData.requiresInsurance}
                       >
                         <option value="GBP">GBP - British Pound</option>
@@ -514,7 +514,7 @@ export default function QuotePage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                             placeholder="1"
                             min="1"
                             required
@@ -533,7 +533,7 @@ export default function QuotePage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-4 py-3 pr-10 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                            className="w-full px-4 py-3 pr-10 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                           >
                             <option value="envelope">Envelope</option>
                             <option value="packet">Packet</option>
@@ -558,7 +558,7 @@ export default function QuotePage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                             step="0.1"
                             required
                           />
@@ -581,7 +581,7 @@ export default function QuotePage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                             required
                           />
                         </div>
@@ -603,7 +603,7 @@ export default function QuotePage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                             required
                           />
                         </div>
@@ -625,7 +625,7 @@ export default function QuotePage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                             required
                           />
                         </div>
@@ -671,7 +671,7 @@ export default function QuotePage() {
           style={{ transitionDelay: "400ms" }}
         >
           <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
               <span className="text-[#1F447B] text-2xl font-bold">£</span>
             </div>
             <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
@@ -683,7 +683,7 @@ export default function QuotePage() {
             </p>
           </div>
           <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
               <span className="text-[#1F447B] text-2xl font-bold">⚡</span>
             </div>
             <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
@@ -695,7 +695,7 @@ export default function QuotePage() {
             </p>
           </div>
           <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
               <span className="text-[#1F447B] text-2xl font-bold">📦</span>
             </div>
             <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
