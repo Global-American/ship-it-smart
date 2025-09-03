@@ -25,24 +25,40 @@ export default function IntegrationsPage() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.1 }
     );
 
     if (headerRef.current) observer.observe(headerRef.current);
     if (contentRef.current) observer.observe(contentRef.current);
+
+    // Trigger animations immediately if elements are already in view
+    setTimeout(() => {
+      if (headerRef.current) {
+        const rect = headerRef.current.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          setIsHeaderVisible(true);
+        }
+      }
+      if (contentRef.current) {
+        const rect = contentRef.current.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          setIsContentVisible(true);
+        }
+      }
+    }, 100);
 
     return () => observer.disconnect();
   }, []);
 
   const categories = [
     "ALL",
+    "CARRIERS",
     "ECOMMERCE STORE",
     "MARKETPLACE",
     "WMS",
     "ORDER MANAGEMENT",
     "FINANCE",
     "API",
-    "CARRIERS",
   ];
 
   const integrations = [
@@ -282,7 +298,7 @@ export default function IntegrationsPage() {
           {/* Sidebar */}
           <div className="lg:w-1/4">
             <div
-              className="rounded-2xl p-6 shadow-lg sticky top-8"
+              className="rounded-2xl p-6 shadow-lg sticky top-8 border-2 border-[#1F447B]"
               style={{ backgroundColor: containerColor }}
             >
               {/* Search */}
@@ -292,7 +308,7 @@ export default function IntegrationsPage() {
                   placeholder="Search"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#F4FAFC] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent text-[#324A6D]"
+                  className="border-2 border-[#1F447B] w-full px-4 py-3 bg-[#F4FAFC] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:border-transparent text-[#324A6D]"
                 />
               </div>
 
@@ -304,7 +320,7 @@ export default function IntegrationsPage() {
                     onClick={() => setSelectedCategory(category)}
                     className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-medium ${
                       selectedCategory === category
-                        ? "bg-[#EB993C] text-white"
+                        ? "bg-[#EB993C] text-white border-2 border-[#1F447B]"
                         : "text-[#324A6D] hover:bg-gray-100"
                     }`}
                   >

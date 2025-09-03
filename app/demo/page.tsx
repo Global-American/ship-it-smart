@@ -46,7 +46,7 @@ export default function DemoPage() {
           }`}
         >
           <div className="inline-block mb-6">
-            <span className="bg-[#EB993C] text-white px-6 py-3 rounded-full text-sm font-semibold">
+            <span className="bg-[#EB993C] text-white px-6 py-3 rounded-full text-sm font-semibold border-2 border-[#1F447B]">
               LIVE DEMO
             </span>
           </div>
@@ -67,7 +67,7 @@ export default function DemoPage() {
           style={{ transitionDelay: "200ms" }}
         >
           <div
-            className="rounded-3xl shadow-2xl p-4 md:p-8 border border-gray-200 relative overflow-hidden"
+            className="rounded-3xl shadow-2xl p-4 md:p-8 border-2 border-[#1F447B] relative overflow-hidden"
             style={{ backgroundColor: containerColor }}
           >
             {/* Background Pattern */}
@@ -207,7 +207,7 @@ export default function DemoPage() {
           style={{ transitionDelay: "400ms" }}
         >
           <div
-            className="rounded-2xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto border border-gray-200"
+            className="rounded-2xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto border-2 border-[#1F447B]"
             style={{ backgroundColor: containerColor }}
           >
             <h2 className="text-3xl font-bold text-[#1F447B] mb-4">
@@ -220,7 +220,7 @@ export default function DemoPage() {
             <div className="flex justify-center">
               <button
                 onClick={() => (window.location.href = "/contact")}
-                className="bg-[#EB993C] hover:bg-[#d97706] text-white font-semibold px-8 py-4 rounded-full text-lg transition-colors duration-200 cursor-pointer shadow-lg hover:shadow-xl"
+                className="border-2 border-[#1F447B] bg-[#EB993C] hover:bg-[#d97706] text-white font-semibold px-8 py-4 rounded-full text-lg transition-colors duration-200 cursor-pointer shadow-lg hover:shadow-xl"
               >
                 Book a Live Demo
               </button>
