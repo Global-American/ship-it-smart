@@ -321,7 +321,7 @@ export default function IntegrationsPage() {
                     className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-medium ${
                       selectedCategory === category
                         ? "bg-[#EB993C] text-white border-2 border-[#1F447B]"
-                        : "text-[#324A6D] hover:bg-gray-100"
+                        : "text-[#324A6D] hover:bg-[#F4FAFC]"
                     }`}
                   >
                     {category}
