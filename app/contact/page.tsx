@@ -244,6 +244,9 @@ export default function ContactPage() {
   const [containerColor, setContainerColor] = useState("#e6ecf7");
   const sectionRef = useRef<HTMLElement>(null);
 
+  const API_BASE =
+    process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api/v1";
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -283,23 +286,31 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      message: "",
-      selectedBrands: [],
-    });
-    setIsSubmitting(false);
-
-    // Here you would typically send the data to your backend
-    console.log("Form submitted:", formData);
+    try {
+      const res = await fetch(`${API_BASE}/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || "Failed to send message");
+      }
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        message: "",
+        selectedBrands: [],
+      });
+      alert("Message sent successfully.");
+    } catch (err) {
+      console.error(err);
+      alert("There was an error sending your message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

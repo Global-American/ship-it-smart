@@ -131,11 +131,11 @@ const Navigation = () => {
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item.href)}
-                  className={`relative font-medium text-base px-2 py-2 transition-colors duration-200
+                  className={`relative group font-medium text-base px-2 py-2 transition-colors duration-200
                     ${
                       isActive
                         ? "text-[#1F447B]"
-                        : "text-[#324A6D] hover:text-[#1F447B]"
+                        : "text-[#324A6D] hover:text-[#EB993C]"
                     }`}
                   style={{
                     cursor: "pointer",
@@ -158,6 +158,12 @@ const Navigation = () => {
                         damping: 25,
                         duration: 0.3,
                       }}
+                    />
+                  )}
+                  {!isActive && (
+                    <span
+                      className="absolute left-0 right-0 -bottom-2 h-0.5 rounded-full bg-[#EB993C] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
+                      aria-hidden="true"
                     />
                   )}
                 </button>
@@ -255,7 +261,7 @@ const Navigation = () => {
                   ${
                     isActive
                       ? "text-[#1F447B] bg-gray-50"
-                      : "text-[#324A6D] hover:text-[#1F447B] hover:bg-gray-50"
+                      : "text-[#324A6D] hover:text-[#EB993C] hover:bg-gray-50"
                   }`}
               >
                 {item.name}

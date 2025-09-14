@@ -188,7 +188,7 @@ export default function QuotePage() {
                       name="fromCountry"
                       value={formData.fromCountry}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-10 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     >
                       <option value="GB">United Kingdom</option>
@@ -237,7 +237,7 @@ export default function QuotePage() {
                       name="toCountry"
                       value={formData.toCountry}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-10 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     >
                       <option value="GB">United Kingdom</option>
@@ -380,7 +380,7 @@ export default function QuotePage() {
                     name="dangerousGoodsCategory"
                     value={formData.dangerousGoodsCategory}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 pr-10 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                    className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                     required={formData.dangerousGoods}
                   >
                     <option value="">Select Category</option>
@@ -424,7 +424,7 @@ export default function QuotePage() {
                         name="insuranceCurrency"
                         value={formData.insuranceCurrency}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 pr-10 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         required={formData.requiresInsurance}
                       >
                         <option value="GBP">GBP - British Pound</option>
@@ -533,7 +533,7 @@ export default function QuotePage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-4 py-3 pr-10 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                            className="w-full px-4 py-3 pr-12 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                           >
                             <option value="envelope">Envelope</option>
                             <option value="packet">Packet</option>
