@@ -103,8 +103,8 @@ const Navigation = () => {
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-100 fixed top-0 left-0 right-0 z-[60] w-full">
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
           {/* Logo - Left aligned */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
@@ -119,7 +119,7 @@ const Navigation = () => {
             </Link>
           </div>
           {/* Desktop Navigation - Right aligned */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => {
               const sectionId = item.href.replace("#", "");
               // Simplified active state logic
