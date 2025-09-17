@@ -6,13 +6,48 @@ import { useEffect, useState } from "react";
 
 // Main solutions with taglines for simple carousel
 const partnerSolutions = [
-  { name: "FreightItSmart", tagline: "Be Smart, Freight itSmart" },
-  { name: "ReturnItSmart", tagline: "Be Smart, Return itSmart" },
-  { name: "FulfillItSmart", tagline: "Be Smart, Fulfill itSmart" },
+  {
+    name: "ShipItSmart",
+    tagline: "Be Smart, Ship itSmart",
+    description:
+      "Discounted express and economy shipping with FedEx, DHL, and UPS for domestic and international parcels—rate compare, book, and track in one place.",
+  },
+  {
+    name: "FreightItSmart",
+    tagline: "Be Smart, Freight itSmart",
+    description:
+      "LTL, FTL, air, and ocean freight made simple—instant quotes, multi‑carrier options, and end‑to‑end visibility for heavy and bulk shipments.",
+  },
+  {
+    name: "ReturnItSmart",
+    tagline: "Be Smart, Return itSmart",
+    description:
+      "Hassle‑free returns with prepaid labels, smart routing, and status updates—improve CX while controlling costs and reverse‑logistics complexity.",
+  },
+  {
+    name: "FulfillItSmart",
+    tagline: "Be Smart, Fulfill itSmart",
+    description:
+      "Omnichannel fulfillment and inventory sync—pick, pack, and ship with real‑time rates, automation rules, and integrations to your sales channels.",
+  },
 ];
 
 const Footer = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Reveal-on-view animation using IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold: 0.1 }
+    );
+    const footerEl = document.querySelector("#footer");
+    if (footerEl) observer.observe(footerEl);
+    return () => observer.disconnect();
+  }, []);
 
   // Auto-advance carousel every 3s
   useEffect(() => {
@@ -22,134 +57,95 @@ const Footer = () => {
     return () => clearInterval(id);
   }, []);
 
+  const getCurrentSolution = () => partnerSolutions[currentIndex];
+
   return (
-    <footer className="bg-white border-t border-gray-200 py-12">
+    <footer id="footer" className="bg-white border-t border-gray-200 py-12">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
-          <div className="col-span-1">
-            <div className="mb-4">
+          <div
+            className={`col-span-1 transition-all duration-700 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-3"
+            }`}
+          >
+            {/* Logo */}
+            <div className="mb-4 text-left">
               <Image
-                src="/shipItSmartMain.png"
-                alt="ShipItSmart Logo"
-                width={120}
-                height={30}
-                style={{ objectFit: "contain", height: 40 }}
+                src="/gaLogo.png"
+                alt="Global American LLC"
+                width={200}
+                height={60}
+                className="h-12 w-auto hover:scale-105 transition-transform duration-300"
               />
             </div>
-            {/* Solutions Carousel (below logo) */}
-            <h4 className="text-base font-semibold mb-3">
-              <span className="text-[#1F447B]">In partnership</span>{" "}
-              <span className="text-[#EB993C]">with</span>
-            </h4>
-            <div className="mb-4">
-              <div className="min-h-[48px] flex items-center">
-                <div
-                  key={currentIndex}
-                  className="w-full transition-all duration-500"
-                >
-                  <p className="text-sm font-semibold text-[#1F447B] leading-tight">
-                    {partnerSolutions[currentIndex].name}
-                  </p>
-                  <p className="text-xs text-[#EB993C] font-medium">
-                    {partnerSolutions[currentIndex].tagline}
-                  </p>
+
+            {/* In Partnership with Section */}
+            <div className="mb-4 text-left">
+              <h4 className="text-base font-semibold mb-3">
+                In <span className="text-[#EB993C]">Partnership</span> with
+              </h4>
+              <div className="relative">
+                <div className="min-h-[60px] flex items-center">
+                  <div
+                    key={`${getCurrentSolution().name}-${currentIndex}`}
+                    className={`text-left transition-all duration-500 w-full ${
+                      isVisible
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-2"
+                    }`}
+                  >
+                    <p className="text-sm font-semibold text-[#1F447B] leading-tight mb-1">
+                      {getCurrentSolution().name}
+                    </p>
+                    <p className="text-xs text-[#EB993C] font-medium">
+                      {getCurrentSolution().tagline}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex flex-row">
-              <h4 className="text-base font-semibold flex-bottom">
-                <span className="text-[#1F447B]">Powered</span>{" "}
-                <span className="text-[#EB993C]">by</span>
-              </h4>
-              <div className="mb-4">
-                <Image
-                  src="/gaLogo.png"
-                  alt="Global American"
-                  width={120}
-                  height={28}
-                  style={{ objectFit: "contain", height: 36 }}
-                />
-              </div>
-            </div>
-            {/* Powered by (styled like 'In Partnership with') */}
 
-            {/* <p className="text-[#324A6D] text-sm leading-relaxed mb-6">
-              We offer exclusive discounts with FedEx, DHL, and UPS for U.S. and
-              international shipping. Our platform provides rate-based import
-              and export services with express and economy options.
-            </p> */}
+            <p className="text-[#324A6D] text-sm leading-relaxed mb-6">
+              {getCurrentSolution().description}
+            </p>
           </div>
 
           {/* Quick Links */}
-          <div className="col-span-1">
-            <h3 className="text-[#1F447B] font-semibold text-lg mb-4">
-              Quick <span className="text-[#EB993C]">Links</span>
+          <div className="col-span-1 flex flex-col">
+            <h3 className="font-semibold text-lg mb-4">
+              <span className="text-[#1F447B]">Quick</span>{" "}
+              <span className="text-[#EB993C]">Links</span>
             </h3>
-            <ul className="space-y-1">
-              <li>
-                <Link
-                  href="/"
-                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#services"
-                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
-                >
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#integrations"
-                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
-                >
-                  Integrations
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/quote"
-                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
-                >
-                  Quote
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/demo"
-                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
-                >
-                  Demo
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about"
-                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-[#324A6D] hover:text-[#1F447B] transition-colors text-sm"
-                >
-                  Contact Us
-                </Link>
-              </li>
+            <ul className="space-y-2">
+              {[
+                { label: "About Us", href: "/about" },
+                { label: "Solutions", href: "/#integrations" },
+                { label: "Services", href: "/#services" },
+                { label: "Testimonials", href: "/#testimonials" },
+                { label: "Get a Quote", href: "/quote" },
+                { label: "Contact Us", href: "/contact" },
+              ].map((link) => (
+                <li key={link.label} className="flex items-start gap-2">
+                  <span className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-[#EB993C] flex-shrink-0"></span>
+                  <Link
+                    href={link.href}
+                    className="text-[#1F447B] hover:text-[#0f2a52] transition-colors text-sm"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Get In Touch */}
           <div className="col-span-1">
-            <h3 className="text-[#1F447B] font-semibold text-lg mb-4">
-              Get In <span className="text-[#EB993C]">Touch</span>
+            <h3 className="font-semibold text-lg mb-4">
+              <span className="text-[#1F447B]">Get In</span>{" "}
+              <span className="text-[#EB993C]">Touch</span>
             </h3>
             <div className="space-y-3">
               <p className="text-[#324A6D] text-sm">Phone: +1 551-205-9492</p>
@@ -185,25 +181,37 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Map */}
-          <div className="col-span-1">
-            <div className="w-full h-full  rounded-lg overflow-hidden flex items-center justify-center">
-              {/* <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3048.4!2d-74.0!3d40.7!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQyJzAwLjAiTiA3NMKwMDAnMDAuMCJX!5e0!3m2!1sen!2sus!4v1234567890"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Birch Industrial Estate Location"
-              ></iframe> */}
+          <div className="col-span-1 flex flex-col justify-between">
+            <h3 className="font-semibold text-lg mb-4">
+              <span className="text-[#1F447B]">Global</span>{" "}
+              <span className="text-[#EB993C]">Locations</span>
+            </h3>
+            <ul className="space-y-3">
+              {[
+                { label: "New York, USA", flag: "🇺🇸" },
+                { label: "Belfast, Northern Ireland", flag: "🇬🇧" },
+                { label: "Dublin, Republic of Ireland", flag: "🇮🇪" },
+                { label: "Manchester, United Kingdom", flag: "🇬🇧" },
+              ].map((loc) => (
+                <li key={loc.label} className="flex items-center gap-2">
+                  <span className="text-lg">📍</span>
+                  <span className="text-xl" aria-hidden>
+                    {loc.flag}
+                  </span>
+                  <span className="text-[#1F447B] text-sm font-medium">
+                    {loc.label}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="pt-6 mt-6 flex justify-end">
               <Image
                 src="/shipItSmartIcon.png"
                 alt="ShipItSmart Icon"
-                width={200}
-                height={200}
-                style={{ objectFit: "contain" }}
+                width={120}
+                height={120}
+                className="h-16 w-auto object-contain"
+                priority={false}
               />
             </div>
           </div>
