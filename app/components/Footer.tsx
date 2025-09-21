@@ -337,18 +337,40 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      {/* Compact Bottom Bar */}
+      {/* Bottom Bar */}
       <div
-        className={`border-t border-accent/10 py-3 transition-all duration-700 ${
+        className={`border-t border-gray-200 py-6 transition-all duration-700 ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
         style={{ transitionDelay: "500ms" }}
       >
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <p className="text-sm text-gray-600">
             &copy; {new Date().getFullYear()} Global American LLC. All rights
             reserved.
           </p>
+
+          {/* Additional Links */}
+          <div className="flex space-x-6">
+            <Link
+              href="/privacy"
+              className="text-sm text-gray-600 hover:text-[#EB993C] transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-sm text-gray-600 hover:text-[#EB993C] transition-colors"
+            >
+              Terms of Service
+            </Link>
+            <Link
+              href="/cookies"
+              className="text-sm text-gray-600 hover:text-[#EB993C] transition-colors"
+            >
+              Cookie Policy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
