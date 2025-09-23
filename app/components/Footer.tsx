@@ -9,7 +9,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./ui/tooltip";
+} from "./tooltip";
 
 // Global locations with full addresses
 const globalLocations = [
