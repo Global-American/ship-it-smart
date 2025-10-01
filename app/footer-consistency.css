@@ -1,0 +1,27 @@
+/**
+ * Footer Image Normalization
+ * Ensures consistent image rendering across repositories without affecting layout width.
+ * Non-invasive approach: preserves existing dimensions while ensuring proper block formatting.
+ */
+
+/* Base footer image normalization */
+[data-footer-image] {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  vertical-align: middle;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+/* Ensure footer images have zero line-height for proper vertical alignment */
+footer [data-footer-image] {
+  line-height: 0;
+}
+
+/* Optional footer row helper (unused by default to keep changes minimal) */
+.footer-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
