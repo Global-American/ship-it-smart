@@ -363,6 +363,7 @@ const Footer = () => {
                 height={195}
                 className="w-auto object-contain"
                 priority={false}
+                data-footer-image=""
               />
             </div>
           </div>
