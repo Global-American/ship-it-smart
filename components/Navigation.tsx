@@ -112,9 +112,8 @@ const Navigation = () => {
                 src="/shipItSmartMain.png"
                 alt="ShipItSmart Logo"
                 width={160}
-                height={35}
+                height={48}
                 priority
-                style={{ objectFit: "contain", height: 35 }}
               />
             </Link>
           </div>

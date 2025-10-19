@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import ColorPicker from "../components/ColorPicker";
+import ColorPicker from "../../components/ColorPicker";
 
 // Custom SVG icons
 function ShipIcon(props: { className?: string }) {

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Badge } from "../../components/Badge";
+import Autoplay from "embla-carousel-autoplay";
 
 const testimonials = [
   {
@@ -80,7 +82,7 @@ const testimonials = [
 export default function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
+  const [isVisible, setIsVisible] = useState(false);
   const testimonialsPerPage = 3;
   const totalPages = Math.ceil(testimonials.length / testimonialsPerPage);
 
@@ -94,6 +96,34 @@ export default function TestimonialsSection() {
 
     return () => clearInterval(interval);
   }, [isAutoPlaying, totalPages]);
+
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const autoplay = useRef(
+    Autoplay({
+      delay: 3000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      playOnInit: true,
+    })
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const goToSlide = (index: number) => {
     if (index === currentIndex) return;
@@ -150,18 +180,23 @@ export default function TestimonialsSection() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-[#1F447B] mb-6">
-            What Our <span className="text-[#EB993C]">Clients Say</span>
+        <div className={`text-center mb-12 lg:mb-20`}>
+          <Badge
+            variant="outline"
+            className="text-xs border-accent text-accent bg-accent/10 mb-4"
+          >
+            Customer Stories
+          </Badge>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+            What Our <span className="text-accent">Clients Say</span>
           </h2>
-          <p className="text-xl text-[#324A6D] max-w-3xl mx-auto leading-relaxed">
-            Don't just take our word for it. Here's what our customers have to
-            say about their experience with Ship It Smart.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+            Don't just take our word for it. Hear from the businesses that trust
+            Global American to power their logistics operations worldwide.
           </p>
         </div>
-
         {/* Main Container */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-100">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-[#1F447B]">
           {/* Testimonials Grid */}
           <div className="relative">
             {/* Navigation Arrows */}
@@ -204,7 +239,7 @@ export default function TestimonialsSection() {
             </button>
 
             {/* Testimonials Container with Smooth Sliding Animation */}
-            <div className="overflow-hidden rounded-2xl">
+            <div className="overflow-hidden rounded-2xl border-[#1F447B]">
               <div
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{
@@ -212,12 +247,12 @@ export default function TestimonialsSection() {
                 }}
               >
                 {getAllSlides().map((slideTestimonials, slideIndex) => (
-                  <div key={slideIndex} className="w-full flex-shrink-0">
+                  <div key={slideIndex} className="w-full flex-shrink-0 ">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {slideTestimonials.map((testimonial) => (
                         <div
                           key={testimonial.id}
-                          className="bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-lg p-8 hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 relative group"
+                          className="bg-[#f6fdfe] rounded-2xl shadow-lg p-8 hover:shadow-xl border border-[#1F447B] relative group"
                         >
                           {/* Quote Icon */}
                           <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
@@ -241,7 +276,7 @@ export default function TestimonialsSection() {
                           </blockquote>
 
                           {/* Author Info */}
-                          <div className="border-t border-gray-200 pt-6">
+                          <div className="border-t border-[#1F447B] pt-6">
                             <h4 className="font-bold text-[#1F447B] text-lg mb-1">
                               {testimonial.name}
                             </h4>
@@ -269,7 +304,7 @@ export default function TestimonialsSection() {
                   className={`rounded-full transition-all duration-300 ${
                     index === currentIndex
                       ? "bg-[#EB993C] w-10 h-4"
-                      : "bg-gray-300 hover:bg-gray-400 w-4 h-4"
+                      : "bg-[#1F447B] hover:bg-[#6f85a6] w-4 h-4"
                   }`}
                 />
               ))}
@@ -279,7 +314,7 @@ export default function TestimonialsSection() {
 
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-          <div className="text-center bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+          <div className="text-center bg-white rounded-2xl p-8 shadow-lg border border-[#1F447B] hover:shadow-xl transition-shadow duration-300">
             <div className="text-5xl font-bold text-[#EB993C] mb-3">4.9/5</div>
             <p className="text-[#324A6D] font-semibold text-lg mb-3">
               Average Rating
@@ -287,7 +322,7 @@ export default function TestimonialsSection() {
             <div className="flex justify-center">{renderStars(5)}</div>
           </div>
 
-          <div className="text-center bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+          <div className="text-center bg-white rounded-2xl p-8 shadow-lg border border-[#1F447B] hover:shadow-xl transition-shadow duration-300">
             <div className="text-5xl font-bold text-[#EB993C] mb-3">
               10,000+
             </div>
@@ -296,7 +331,7 @@ export default function TestimonialsSection() {
             </p>
           </div>
 
-          <div className="text-center bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+          <div className="text-center bg-white rounded-2xl p-8 shadow-lg border border-[#1F447B] hover:shadow-xl transition-shadow duration-300">
             <div className="text-5xl font-bold text-[#EB993C] mb-3">99.8%</div>
             <p className="text-[#324A6D] font-semibold text-lg">
               Customer Satisfaction

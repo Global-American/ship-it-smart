@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import ColorPicker from "../components/ColorPicker";
+import ColorPicker from "../../components/ColorPicker";
 
 export default function AboutPage() {
   const [isAboutVisible, setIsAboutVisible] = useState(false);
@@ -81,7 +81,7 @@ export default function AboutPage() {
           </div>
           <div className="flex justify-center">
             <div
-              className="w-full max-w-md h-96 rounded-lg flex items-center justify-center"
+              className="w-full max-w-md h-96 rounded-lg flex items-center justify-center border-2 border-[#1F447B]"
               style={{ backgroundColor: containerColor }}
             >
               <span className="text-[#1F447B] text-lg">About Us Image</span>
@@ -118,7 +118,7 @@ export default function AboutPage() {
               style={{ transitionDelay: "200ms" }}
             >
               <div
-                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer border-2 border-[#1F447B]"
                 style={{ backgroundColor: containerColor }}
               >
                 <svg
@@ -145,7 +145,7 @@ export default function AboutPage() {
               style={{ transitionDelay: "300ms" }}
             >
               <div
-                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer border-2 border-[#1F447B]"
                 style={{ backgroundColor: containerColor }}
               >
                 <svg
@@ -172,7 +172,7 @@ export default function AboutPage() {
               style={{ transitionDelay: "400ms" }}
             >
               <div
-                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer border-2 border-[#1F447B]"
                 style={{ backgroundColor: containerColor }}
               >
                 <svg
@@ -199,7 +199,7 @@ export default function AboutPage() {
               style={{ transitionDelay: "500ms" }}
             >
               <div
-                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                className="w-64 h-64 rounded-lg mb-6 mx-auto flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer border-2 border-[#1F447B]"
                 style={{ backgroundColor: containerColor }}
               >
                 <svg
