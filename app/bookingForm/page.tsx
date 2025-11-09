@@ -13,12 +13,31 @@ interface Package {
   height: string;
 }
 
-export default function QuotePage() {
+export default function BookingFormPage() {
   const [formData, setFormData] = useState({
-    fromPostcode: "",
+    // From address details
     fromCountry: "US",
-    toPostcode: "",
+    fromPostcode: "",
+    fromCompany: "",
+    fromContactName: "",
+    fromPhone: "",
+    fromEmail: "",
+    fromAddress1: "",
+    fromAddress2: "",
+    fromCity: "",
+    fromState: "",
+    // To address details
     toCountry: "US",
+    toPostcode: "",
+    toCompany: "",
+    toContactName: "",
+    toPhone: "",
+    toEmail: "",
+    toAddress1: "",
+    toAddress2: "",
+    toCity: "",
+    toState: "",
+    // Options
     residentialAddress: false,
     requestPickup: false,
     dangerousGoods: false,
@@ -27,6 +46,11 @@ export default function QuotePage() {
     insuranceValue: "",
     insuranceCurrency: "USD",
     measurementUnit: "metric",
+    // Pickup details (shown when requestPickup is enabled)
+    pickupDate: "",
+    pickupTimeStart: "",
+    pickupTimeEnd: "",
+    pickupInstructions: "",
   });
 
   const [packages, setPackages] = useState<Package[]>([
@@ -76,7 +100,9 @@ export default function QuotePage() {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
     setFormData((prev) => ({
@@ -118,8 +144,62 @@ export default function QuotePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle quote request
-    console.log("Quote request:", { ...formData, packages });
+    // Basic validation for pickup range
+    if (formData.requestPickup) {
+      if (
+        formData.pickupTimeStart &&
+        formData.pickupTimeEnd &&
+        formData.pickupTimeStart >= formData.pickupTimeEnd
+      ) {
+        alert("Pickup end time must be after start time");
+        return;
+      }
+    }
+    // Handle book shipment request
+    const payload = {
+      from: {
+        country: formData.fromCountry,
+        postcode: formData.fromPostcode,
+        company: formData.fromCompany,
+        contactName: formData.fromContactName,
+        phone: formData.fromPhone,
+        email: formData.fromEmail,
+        address1: formData.fromAddress1,
+        address2: formData.fromAddress2,
+        city: formData.fromCity,
+        state: formData.fromState,
+        contactRef: (formData as any).fromContactRef || "",
+      },
+      to: {
+        country: formData.toCountry,
+        postcode: formData.toPostcode,
+        company: formData.toCompany,
+        contactName: formData.toContactName,
+        phone: formData.toPhone,
+        email: formData.toEmail,
+        address1: formData.toAddress1,
+        address2: formData.toAddress2,
+        city: formData.toCity,
+        state: formData.toState,
+        contactRef: (formData as any).toContactRef || "",
+      },
+      options: {
+        residentialAddress: formData.residentialAddress,
+        requestPickup: formData.requestPickup,
+        pickupDate: formData.pickupDate,
+        pickupTimeStart: formData.pickupTimeStart,
+        pickupTimeEnd: formData.pickupTimeEnd,
+        pickupInstructions: formData.pickupInstructions,
+        dangerousGoods: formData.dangerousGoods,
+        dangerousGoodsCategory: formData.dangerousGoodsCategory,
+        requiresInsurance: formData.requiresInsurance,
+        insuranceValue: formData.insuranceValue,
+        insuranceCurrency: formData.insuranceCurrency,
+        measurementUnit: formData.measurementUnit,
+      },
+      packages,
+    };
+    console.log("Book Shipment Request:", payload);
   };
 
   return (
@@ -137,14 +217,10 @@ export default function QuotePage() {
         {/* Header */}
         <div
           ref={headerRef}
-          className={`text-center mb-12 lg:mb-20 transition-all duration-700 ${
-            isHeaderVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-4"
-          }`}
+          className={`text-center mb-12 lg:mb-20 transition-all duration-700`}
         >
           <h1 className="text-3xl md:text-4xl font-bold text-[#1F447B] mb-4">
-            Get Your <span className="text-[#EB993C]">Shipping Quote</span>
+            Book Your <span className="text-[#EB993C]">Shipment</span>
           </h1>
           <p className="text-lg text-[#324A6D] max-w-2xl mx-auto">
             Compare shipping rates from multiple carriers and find the best
@@ -152,14 +228,9 @@ export default function QuotePage() {
           </p>
         </div>
 
-        {/* Quote Form */}
+        {/* Booking Form */}
         <div
-          className={`max-w-5xl lg:max-w-6xl mx-auto transition-all duration-700 ${
-            isFormVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-4"
-          }`}
-          style={{ transitionDelay: "200ms" }}
+          className={`max-w-5xl lg:max-w-6xl mx-auto transition-all duration-700`}
         >
           <div
             ref={formRef}
@@ -170,103 +241,329 @@ export default function QuotePage() {
           >
             <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
               {/* Addresses */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-[#1F447B]">From</h4>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Country
-                    </label>
-                    <select
-                      name="fromCountry"
-                      value={formData.fromCountry}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      required
-                    >
-                      <option value="GB">United Kingdom</option>
-                      <option value="US">United States</option>
-                      <option value="CA">Canada</option>
-                      <option value="AU">Australia</option>
-                      <option value="DE">Germany</option>
-                      <option value="FR">France</option>
-                      <option value="IT">Italy</option>
-                      <option value="ES">Spain</option>
-                      <option value="NL">Netherlands</option>
-                      <option value="BE">Belgium</option>
-                      <option value="CH">Switzerland</option>
-                      <option value="AT">Austria</option>
-                      <option value="IE">Ireland</option>
-                      <option value="DK">Denmark</option>
-                      <option value="SE">Sweden</option>
-                      <option value="NO">Norway</option>
-                      <option value="FI">Finland</option>
-                      <option value="PL">Poland</option>
-                      <option value="CZ">Czech Republic</option>
-                      <option value="HU">Hungary</option>
-                    </select>
+              <div className="space-y-10">
+                <div className="bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                  <h4 className="text-xl font-semibold text-[#1F447B] mb-6">
+                    From Address
+                  </h4>
+                  {/* Company / Contact */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Company
+                      </label>
+                      <input
+                        type="text"
+                        name="fromCompany"
+                        value={formData.fromCompany}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="Sender Company"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Contact Name
+                      </label>
+                      <input
+                        type="text"
+                        name="fromContactName"
+                        value={formData.fromContactName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="John Doe"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Postcode
-                    </label>
-                    <input
-                      type="text"
-                      name="fromPostcode"
-                      value={formData.fromPostcode}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      required
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Phone
+                      </label>
+                      <input
+                        type="tel"
+                        name="fromPhone"
+                        value={formData.fromPhone}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="+1 555 123 4567"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        name="fromEmail"
+                        value={formData.fromEmail}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="sender@example.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Address Line 1
+                      </label>
+                      <input
+                        type="text"
+                        name="fromAddress1"
+                        value={formData.fromAddress1}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="123 Main St"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Address Line 2
+                      </label>
+                      <input
+                        type="text"
+                        name="fromAddress2"
+                        value={formData.fromAddress2}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="Suite / Unit / Apt"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="fromCity"
+                        value={formData.fromCity}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        State / Province
+                      </label>
+                      <input
+                        type="text"
+                        name="fromState"
+                        value={formData.fromState}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Postcode
+                      </label>
+                      <input
+                        type="text"
+                        name="fromPostcode"
+                        value={formData.fromPostcode}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Country
+                      </label>
+                      <select
+                        name="fromCountry"
+                        value={formData.fromCountry}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required
+                      >
+                        <option value="GB">United Kingdom</option>
+                        <option value="US">United States</option>
+                        <option value="CA">Canada</option>
+                        <option value="AU">Australia</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="IT">Italy</option>
+                        <option value="ES">Spain</option>
+                        <option value="NL">Netherlands</option>
+                        <option value="BE">Belgium</option>
+                        <option value="CH">Switzerland</option>
+                        <option value="AT">Austria</option>
+                        <option value="IE">Ireland</option>
+                        <option value="DK">Denmark</option>
+                        <option value="SE">Sweden</option>
+                        <option value="NO">Norway</option>
+                        <option value="FI">Finland</option>
+                        <option value="PL">Poland</option>
+                        <option value="CZ">Czech Republic</option>
+                        <option value="HU">Hungary</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-[#1F447B]">To</h4>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Country
-                    </label>
-                    <select
-                      name="toCountry"
-                      value={formData.toCountry}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      required
-                    >
-                      <option value="GB">United Kingdom</option>
-                      <option value="US">United States</option>
-                      <option value="CA">Canada</option>
-                      <option value="AU">Australia</option>
-                      <option value="DE">Germany</option>
-                      <option value="FR">France</option>
-                      <option value="IT">Italy</option>
-                      <option value="ES">Spain</option>
-                      <option value="NL">Netherlands</option>
-                      <option value="BE">Belgium</option>
-                      <option value="CH">Switzerland</option>
-                      <option value="AT">Austria</option>
-                      <option value="IE">Ireland</option>
-                      <option value="DK">Denmark</option>
-                      <option value="SE">Sweden</option>
-                      <option value="NO">Norway</option>
-                      <option value="FI">Finland</option>
-                      <option value="PL">Poland</option>
-                      <option value="CZ">Czech Republic</option>
-                      <option value="HU">Hungary</option>
-                    </select>
+                <div className="bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                  <h4 className="text-xl font-semibold text-[#1F447B] mb-6">
+                    To Address
+                  </h4>
+                  {/* Company / Contact */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Company
+                      </label>
+                      <input
+                        type="text"
+                        name="toCompany"
+                        value={formData.toCompany}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="Recipient Company"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Contact Name
+                      </label>
+                      <input
+                        type="text"
+                        name="toContactName"
+                        value={formData.toContactName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="Jane Smith"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Postcode
-                    </label>
-                    <input
-                      type="text"
-                      name="toPostcode"
-                      value={formData.toPostcode}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      required
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Phone
+                      </label>
+                      <input
+                        type="tel"
+                        name="toPhone"
+                        value={formData.toPhone}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="+44 20 1234 5678"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        name="toEmail"
+                        value={formData.toEmail}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="recipient@example.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Address Line 1
+                      </label>
+                      <input
+                        type="text"
+                        name="toAddress1"
+                        value={formData.toAddress1}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="456 Market St"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Address Line 2
+                      </label>
+                      <input
+                        type="text"
+                        name="toAddress2"
+                        value={formData.toAddress2}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="Suite / Unit / Apt"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="toCity"
+                        value={formData.toCity}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        State / Province
+                      </label>
+                      <input
+                        type="text"
+                        name="toState"
+                        value={formData.toState}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Postcode
+                      </label>
+                      <input
+                        type="text"
+                        name="toPostcode"
+                        value={formData.toPostcode}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Country
+                      </label>
+                      <select
+                        name="toCountry"
+                        value={formData.toCountry}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required
+                      >
+                        <option value="GB">United Kingdom</option>
+                        <option value="US">United States</option>
+                        <option value="CA">Canada</option>
+                        <option value="AU">Australia</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="IT">Italy</option>
+                        <option value="ES">Spain</option>
+                        <option value="NL">Netherlands</option>
+                        <option value="BE">Belgium</option>
+                        <option value="CH">Switzerland</option>
+                        <option value="AT">Austria</option>
+                        <option value="IE">Ireland</option>
+                        <option value="DK">Denmark</option>
+                        <option value="SE">Sweden</option>
+                        <option value="NO">Norway</option>
+                        <option value="FI">Finland</option>
+                        <option value="PL">Poland</option>
+                        <option value="CZ">Czech Republic</option>
+                        <option value="HU">Hungary</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -362,6 +659,66 @@ export default function QuotePage() {
                   </div>
                 </div>
               </div>
+
+              {/* Pickup Details */}
+              {formData.requestPickup && (
+                <div className="bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                    Pickup Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Pickup Date
+                      </label>
+                      <input
+                        type="date"
+                        name="pickupDate"
+                        value={formData.pickupDate}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required={formData.requestPickup}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Time Range (Local Time)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="time"
+                          name="pickupTimeStart"
+                          value={formData.pickupTimeStart}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                          required={formData.requestPickup}
+                        />
+                        <span className="text-[#324A6D]">→</span>
+                        <input
+                          type="time"
+                          name="pickupTimeEnd"
+                          value={formData.pickupTimeEnd}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                          required={formData.requestPickup}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Pickup Instructions
+                    </label>
+                    <textarea
+                      name="pickupInstructions"
+                      value={formData.pickupInstructions}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D] min-h-[80px]"
+                      placeholder="e.g., Call upon arrival, loading dock at rear"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Dangerous Goods Category Dropdown */}
               {formData.dangerousGoods && (
@@ -646,58 +1003,10 @@ export default function QuotePage() {
                   type="submit"
                   className="bg-[#EB993C] hover:bg-[#d4822a] text-white font-semibold px-12 py-4 rounded-lg text-lg transition-colors duration-200 border-2 border-[#1F447B]"
                 >
-                  Get Quote
+                  Book Shipment
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-
-        {/* Benefits */}
-        <div
-          ref={benefitsRef}
-          className={`mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-700 ${
-            isBenefitsVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-4"
-          }`}
-          style={{ transitionDelay: "400ms" }}
-        >
-          <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
-              <span className="text-[#1F447B] text-2xl font-bold">£</span>
-            </div>
-            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-              Best Rates
-            </h3>
-            <p className="text-[#324A6D]">
-              Compare prices from multiple carriers to find the most competitive
-              shipping rates.
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
-              <span className="text-[#1F447B] text-2xl font-bold">⚡</span>
-            </div>
-            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-              Instant Quotes
-            </h3>
-            <p className="text-[#324A6D]">
-              Get real-time shipping quotes in seconds with our advanced pricing
-              engine.
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
-              <span className="text-[#1F447B] text-2xl font-bold">📦</span>
-            </div>
-            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-              Multiple Carriers
-            </h3>
-            <p className="text-[#324A6D]">
-              Choose from Royal Mail, DPD, UPS, FedEx, DHL and many more
-              carriers.
-            </p>
           </div>
         </div>
       </div>

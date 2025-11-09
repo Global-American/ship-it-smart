@@ -178,7 +178,8 @@ export default function Footer() {
                 { label: "Demo", href: "/demo" },
                 { label: "About Us", href: "/about" },
                 { label: "Contact Us", href: "/contact" },
-                { label: "Booking Form", href: "/booking" },
+                { label: "Booking Form", href: "/bookingForm" },
+                { label: "Account Form", href: "/accountForm" },
               ].map((link) => (
                 <div
                   key={link.label}
@@ -289,7 +290,7 @@ export default function Footer() {
                 <div className="flex justify-start space-x-4 pt-2">
                   <a
                     href="#"
-                    className="text-[#1F447B] hover:text-[#EB993C] transition-colors"
+                    className="text-[#EB993C] hover:text-[#1F447B] transition-colors"
                     aria-label="Facebook"
                   >
                     <svg
@@ -302,7 +303,7 @@ export default function Footer() {
                   </a>
                   <a
                     href="#"
-                    className="text-[#1F447B] hover:text-[#EB993C] transition-colors"
+                    className="text-[#EB993C] hover:text-[#1F447B] transition-colors"
                     aria-label="X"
                   >
                     <svg
@@ -315,7 +316,7 @@ export default function Footer() {
                   </a>
                   <a
                     href="#"
-                    className="text-[#1F447B] hover:text-[#EB993C] transition-colors"
+                    className="text-[#EB993C] hover:text-[#1F447B] transition-colors"
                     aria-label="LinkedIn"
                   >
                     <svg
@@ -328,7 +329,7 @@ export default function Footer() {
                   </a>
                   <a
                     href="#"
-                    className="text-[#1F447B] hover:text-[#EB993C] transition-colors"
+                    className="text-[#EB993C] hover:text-[#1F447B] transition-colors"
                     aria-label="Instagram"
                   >
                     <svg
@@ -341,7 +342,7 @@ export default function Footer() {
                   </a>
                   <a
                     href="#"
-                    className="text-[#1F447B] hover:text-[#EB993C] transition-colors"
+                    className="text-[#EB993C] hover:text-[#1F447B] transition-colors"
                     aria-label="YouTube"
                   >
                     <svg
@@ -354,7 +355,7 @@ export default function Footer() {
                   </a>
                   <a
                     href="#"
-                    className="text-[#1F447B] hover:text-[#EB993C] transition-colors"
+                    className="text-[#EB993C] hover:text-[#1F447B] transition-colors"
                     aria-label="TikTok"
                   >
                     <svg
