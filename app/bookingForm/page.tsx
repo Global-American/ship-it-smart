@@ -3,6 +3,19 @@
 import { useState, useEffect, useRef } from "react";
 import ColorPicker from "../../components/ColorPicker";
 
+interface Item {
+  id: string;
+  description: string;
+  commodityCode: string;
+  sku: string;
+  quantity: string;
+  value: string;
+  currency: string;
+  weight: string;
+  countryOfOrigin: string;
+  manufacturerDetails: string;
+}
+
 interface Package {
   id: string;
   quantity: string;
@@ -11,6 +24,7 @@ interface Package {
   length: string;
   width: string;
   height: string;
+  items: Item[];
 }
 
 export default function BookingFormPage() {
@@ -26,6 +40,8 @@ export default function BookingFormPage() {
     fromAddress2: "",
     fromCity: "",
     fromState: "",
+    fromEori: "", // Added
+    fromVatEin: "", // Added
     // To address details
     toCountry: "US",
     toPostcode: "",
@@ -37,6 +53,8 @@ export default function BookingFormPage() {
     toAddress2: "",
     toCity: "",
     toState: "",
+    toEori: "", // Added
+    toVatEin: "", // Added
     // Options
     residentialAddress: false,
     requestPickup: false,
@@ -46,7 +64,7 @@ export default function BookingFormPage() {
     insuranceValue: "",
     insuranceCurrency: "USD",
     measurementUnit: "metric",
-    // Pickup details (shown when requestPickup is enabled)
+    // Pickup details
     pickupDate: "",
     pickupTimeStart: "",
     pickupTimeEnd: "",
@@ -62,6 +80,20 @@ export default function BookingFormPage() {
       length: "",
       width: "",
       height: "",
+      items: [
+        {
+          id: "item-1",
+          description: "",
+          commodityCode: "",
+          sku: "",
+          quantity: "1",
+          value: "",
+          currency: "USD",
+          weight: "",
+          countryOfOrigin: "US",
+          manufacturerDetails: "",
+        },
+      ],
     },
   ]);
 
@@ -123,6 +155,27 @@ export default function BookingFormPage() {
     );
   };
 
+  // Item handlers
+  const handleItemChange = (
+    packageId: string,
+    itemId: string,
+    field: keyof Item,
+    value: string
+  ) => {
+    setPackages((prev) =>
+      prev.map((pkg) =>
+        pkg.id === packageId
+          ? {
+              ...pkg,
+              items: pkg.items.map((it) =>
+                it.id === itemId ? { ...it, [field]: value } : it
+              ),
+            }
+          : pkg
+      )
+    );
+  };
+
   const addPackage = () => {
     const newPackage: Package = {
       id: Date.now().toString(),
@@ -132,6 +185,20 @@ export default function BookingFormPage() {
       length: "",
       width: "",
       height: "",
+      items: [
+        {
+          id: `item-${Date.now()}`,
+          description: "",
+          commodityCode: "",
+          sku: "",
+          quantity: "1",
+          value: "",
+          currency: "USD",
+          weight: "",
+          countryOfOrigin: "US",
+          manufacturerDetails: "",
+        },
+      ],
     };
     setPackages((prev) => [...prev, newPackage]);
   };
@@ -140,6 +207,42 @@ export default function BookingFormPage() {
     if (packages.length > 1) {
       setPackages((prev) => prev.filter((pkg) => pkg.id !== packageId));
     }
+  };
+
+  const addItemToPackage = (packageId: string) => {
+    const newItem: Item = {
+      id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      description: "",
+      commodityCode: "",
+      sku: "",
+      quantity: "1",
+      value: "",
+      currency: "USD",
+      weight: "",
+      countryOfOrigin: "US",
+      manufacturerDetails: "",
+    };
+    setPackages((prev) =>
+      prev.map((pkg) =>
+        pkg.id === packageId ? { ...pkg, items: [...pkg.items, newItem] } : pkg
+      )
+    );
+  };
+
+  const removeItemFromPackage = (packageId: string, itemId: string) => {
+    setPackages((prev) =>
+      prev.map((pkg) =>
+        pkg.id === packageId
+          ? {
+              ...pkg,
+              items:
+                pkg.items.length > 1
+                  ? pkg.items.filter((it) => it.id !== itemId)
+                  : pkg.items,
+            }
+          : pkg
+      )
+    );
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -168,6 +271,8 @@ export default function BookingFormPage() {
         address2: formData.fromAddress2,
         city: formData.fromCity,
         state: formData.fromState,
+        eori: formData.fromEori, // Added
+        vatEin: formData.fromVatEin, // Added
         contactRef: (formData as any).fromContactRef || "",
       },
       to: {
@@ -181,6 +286,8 @@ export default function BookingFormPage() {
         address2: formData.toAddress2,
         city: formData.toCity,
         state: formData.toState,
+        eori: formData.toEori, // Added
+        vatEin: formData.toVatEin, // Added
         contactRef: (formData as any).toContactRef || "",
       },
       options: {
@@ -275,6 +382,35 @@ export default function BookingFormPage() {
                       />
                     </div>
                   </div>
+                  {/* New EORI / VAT-EIN Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        EORI Number
+                      </label>
+                      <input
+                        type="text"
+                        name="fromEori"
+                        value={formData.fromEori}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="GB123456789000"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        VAT / EIN Number
+                      </label>
+                      <input
+                        type="text"
+                        name="fromVatEin"
+                        value={formData.fromVatEin}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="VAT123456 / 12-3456789"
+                      />
+                    </div>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
@@ -358,7 +494,7 @@ export default function BookingFormPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Postcode
+                        Postcode / ZIP
                       </label>
                       <input
                         type="text"
@@ -434,6 +570,35 @@ export default function BookingFormPage() {
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         placeholder="Jane Smith"
+                      />
+                    </div>
+                  </div>
+                  {/* New EORI / VAT-EIN Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        EORI Number
+                      </label>
+                      <input
+                        type="text"
+                        name="toEori"
+                        value={formData.toEori}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="EU123456789000"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        VAT / EIN Number
+                      </label>
+                      <input
+                        type="text"
+                        name="toVatEin"
+                        value={formData.toVatEin}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="VAT987654 / 98-7654321"
                       />
                     </div>
                   </div>
@@ -520,7 +685,7 @@ export default function BookingFormPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Postcode
+                        Postcode / ZIP
                       </label>
                       <input
                         type="text"
@@ -978,6 +1143,246 @@ export default function BookingFormPage() {
                             className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                             required
                           />
+                        </div>
+                      </div>
+
+                      {/* Items within this package */}
+                      <div className="mt-8">
+                        <div className="flex justify-between items-center mb-2">
+                          <h5 className="text-md font-semibold text-[#1F447B]">
+                            Items
+                          </h5>
+                          <button
+                            type="button"
+                            onClick={() => addItemToPackage(pkg.id)}
+                            className="text-sm bg-[#1F447B] text-white px-3 py-1 rounded-md border-2 border-[#EB993C] hover:bg-[#173862] transition-colors"
+                          >
+                            + Add Item
+                          </button>
+                        </div>
+                        <div className="space-y-6">
+                          {pkg.items.map((item, itemIndex) => (
+                            <div
+                              key={item.id}
+                              className="p-4 rounded-lg border-2 border-[#1F447B]/40 bg-[#F4FAFC]"
+                            >
+                              <div className="flex justify-between items-center mb-4">
+                                <h6 className="font-medium text-[#1F447B]">
+                                  Item #{itemIndex + 1}
+                                </h6>
+                                {pkg.items.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      removeItemFromPackage(pkg.id, item.id)
+                                    }
+                                    className="text-xs text-[#EB993C] border border-[#EB993C] px-2 py-1 rounded hover:bg-[#EB993C]/10"
+                                  >
+                                    Remove
+                                  </button>
+                                )}
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                                {/* Row 1 */}
+                                <div>
+                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                    Description
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={item.description}
+                                    onChange={(e) =>
+                                      handleItemChange(
+                                        pkg.id,
+                                        item.id,
+                                        "description",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                    Commodity code
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={item.commodityCode}
+                                    onChange={(e) =>
+                                      handleItemChange(
+                                        pkg.id,
+                                        item.id,
+                                        "commodityCode",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                    SKU
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={item.sku}
+                                    onChange={(e) =>
+                                      handleItemChange(
+                                        pkg.id,
+                                        item.id,
+                                        "sku",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                    Quantity
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={item.quantity}
+                                    onChange={(e) =>
+                                      handleItemChange(
+                                        pkg.id,
+                                        item.id,
+                                        "quantity",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                                  />
+                                </div>
+                                {/* Row 2 */}
+                                <div>
+                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                    Item Weight (
+                                    {formData.measurementUnit === "metric"
+                                      ? "kg"
+                                      : "lbs"}
+                                    )
+                                  </label>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={item.weight}
+                                    onChange={(e) =>
+                                      handleItemChange(
+                                        pkg.id,
+                                        item.id,
+                                        "weight",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                    Item value
+                                  </label>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={item.value}
+                                    onChange={(e) =>
+                                      handleItemChange(
+                                        pkg.id,
+                                        item.id,
+                                        "value",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                    Currency
+                                  </label>
+                                  <select
+                                    value={item.currency}
+                                    onChange={(e) =>
+                                      handleItemChange(
+                                        pkg.id,
+                                        item.id,
+                                        "currency",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                                  >
+                                    <option value="GBP">GBP - £</option>
+                                    <option value="USD">USD - $</option>
+                                    <option value="EUR">EUR - €</option>
+                                    <option value="CAD">CAD - $</option>
+                                    <option value="AUD">AUD - $</option>
+                                    <option value="JPY">JPY - ¥</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                    Country of origin
+                                  </label>
+                                  <select
+                                    value={item.countryOfOrigin}
+                                    onChange={(e) =>
+                                      handleItemChange(
+                                        pkg.id,
+                                        item.id,
+                                        "countryOfOrigin",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                                  >
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="FR">France</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="ES">Spain</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="BE">Belgium</option>
+                                    <option value="CH">Switzerland</option>
+                                    <option value="AT">Austria</option>
+                                    <option value="IE">Ireland</option>
+                                    <option value="DK">Denmark</option>
+                                    <option value="SE">Sweden</option>
+                                    <option value="NO">Norway</option>
+                                    <option value="FI">Finland</option>
+                                    <option value="PL">Poland</option>
+                                    <option value="CZ">Czech Republic</option>
+                                    <option value="HU">Hungary</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                                  Manufacturer details
+                                </label>
+                                <textarea
+                                  value={item.manufacturerDetails}
+                                  onChange={(e) =>
+                                    handleItemChange(
+                                      pkg.id,
+                                      item.id,
+                                      "manufacturerDetails",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D] min-h-[70px]"
+                                  placeholder="Factory info, batch numbers, etc."
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
