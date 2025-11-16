@@ -43,8 +43,8 @@ export default function BookingFormPage() {
     fromAddress2: "",
     fromCity: "",
     fromState: "",
-    fromEori: "", // Added
-    fromVatEin: "", // Added
+    fromEori: "",
+    fromVatEin: "",
     // To address details
     toCountry: "US",
     toPostcode: "",
@@ -56,8 +56,8 @@ export default function BookingFormPage() {
     toAddress2: "",
     toCity: "",
     toState: "",
-    toEori: "", // Added
-    toVatEin: "", // Added
+    toEori: "",
+    toVatEin: "",
     // Options
     residentialAddress: false,
     requestPickup: false,
@@ -65,6 +65,7 @@ export default function BookingFormPage() {
     dangerousGoodsCategory: "",
     requiresInsurance: false,
     uploadDocuments: false,
+    emailNotifications: false,
     insuranceValue: "",
     insuranceCurrency: "USD",
     measurementUnit: "metric",
@@ -73,6 +74,11 @@ export default function BookingFormPage() {
     pickupTimeStart: "",
     pickupTimeEnd: "",
     pickupInstructions: "",
+    // References
+    customerReference: "",
+    customerReference2: "",
+    orderNumber: "",
+    invoiceNumber: "",
   });
 
   const [packages, setPackages] = useState<Package[]>([
@@ -109,6 +115,21 @@ export default function BookingFormPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     setDocuments(files);
+  };
+
+  // Email notifications
+  const [notifyEmails, setNotifyEmails] = useState<string[]>([""]);
+
+  const handleNotifyEmailChange = (index: number, value: string) => {
+    setNotifyEmails((prev) => prev.map((e, i) => (i === index ? value : e)));
+  };
+
+  const addNotifyEmail = () => {
+    setNotifyEmails((prev) => (prev.length < 5 ? [...prev, ""] : prev));
+  };
+
+  const removeNotifyEmail = (index: number) => {
+    setNotifyEmails((prev) => prev.filter((_, i) => i !== index));
   };
 
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
@@ -282,6 +303,8 @@ export default function BookingFormPage() {
         dangerousGoodsCategory: formData.dangerousGoodsCategory,
         requiresInsurance: formData.requiresInsurance,
         uploadDocuments: formData.uploadDocuments,
+        emailNotifications: formData.emailNotifications,
+        notifyEmails,
         insuranceValue: formData.insuranceValue,
         insuranceCurrency: formData.insuranceCurrency,
         measurementUnit: formData.measurementUnit,
@@ -293,6 +316,12 @@ export default function BookingFormPage() {
         type: f.type,
       })),
       items,
+      references: {
+        customerReference: formData.customerReference,
+        customerReference2: formData.customerReference2,
+        orderNumber: formData.orderNumber,
+        invoiceNumber: formData.invoiceNumber,
+      },
     };
     console.log("Book Shipment Request:", payload);
   };
@@ -1349,6 +1378,27 @@ export default function BookingFormPage() {
                       <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
                     </label>
                   </div>
+
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
+                        Email Notifications
+                      </label>
+                      <p className="text-xs text-[#EB993C] mt-1">
+                        Send shipment updates to up to 5 emails
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="emailNotifications"
+                        checked={formData.emailNotifications}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -1511,6 +1561,51 @@ export default function BookingFormPage() {
                 </div>
               )}
 
+              {formData.emailNotifications && (
+                <div className="mt-4 bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                    Email Notifications
+                  </h3>
+                  <div className="space-y-3">
+                    {notifyEmails.map((email, idx) => (
+                      <div key={idx} className="flex gap-3 items-center">
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) =>
+                            handleNotifyEmailChange(idx, e.target.value)
+                          }
+                          className="flex-1 px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          placeholder={`email ${idx + 1}`}
+                        />
+                        {notifyEmails.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeNotifyEmail(idx)}
+                            className="text-[#EB993C] border border-[#EB993C] rounded-md px-3 py-2 text-sm hover:bg-[#EB993C]/10"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <div>
+                      <button
+                        type="button"
+                        onClick={addNotifyEmail}
+                        disabled={notifyEmails.length >= 5}
+                        className="bg-[#1F447B] disabled:opacity-50 hover:bg-[#1a3a6b] text-white px-4 py-2 rounded-lg transition-colors duration-200 border-2 border-[#EB993C]"
+                      >
+                        Add another email
+                      </button>
+                      <p className="text-xs text-[#324A6D] mt-2">
+                        Up to 5 recipients.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Totals Summary */}
               <div className="mt-8 bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
                 <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
@@ -1582,6 +1677,67 @@ export default function BookingFormPage() {
                     <p className="text-xs text-[#EB993C] mt-2">
                       Items (quantity × value)
                     </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Reference Details (before Submit) */}
+              <div className="mt-8 bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                  Reference Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Customer Reference
+                    </label>
+                    <input
+                      type="text"
+                      name="customerReference"
+                      value={formData.customerReference}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      placeholder="Customer reference"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Customer Reference 2
+                    </label>
+                    <input
+                      type="text"
+                      name="customerReference2"
+                      value={formData.customerReference2}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      placeholder="Secondary reference"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Order Number
+                    </label>
+                    <input
+                      type="text"
+                      name="orderNumber"
+                      value={formData.orderNumber}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      placeholder="PO / Order #"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Invoice Number
+                    </label>
+                    <input
+                      type="text"
+                      name="invoiceNumber"
+                      value={formData.invoiceNumber}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      placeholder="Invoice #"
+                    />
                   </div>
                 </div>
               </div>
