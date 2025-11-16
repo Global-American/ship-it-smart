@@ -26,18 +26,44 @@ interface Package {
   height: string;
 }
 
+// Country calling codes used for phone number country dropdowns
+const COUNTRY_DIAL_CODES: Record<string, string> = {
+  US: "+1",
+  GB: "+44",
+  CA: "+1",
+  AU: "+61",
+  DE: "+49",
+  FR: "+33",
+  IT: "+39",
+  ES: "+34",
+  NL: "+31",
+  BE: "+32",
+  CH: "+41",
+  AT: "+43",
+  IE: "+353",
+  DK: "+45",
+  SE: "+46",
+  NO: "+47",
+  FI: "+358",
+  PL: "+48",
+  CZ: "+420",
+  HU: "+36",
+};
+
 export default function BookingFormPage() {
   const [formData, setFormData] = useState({
     // Booking contact details
     bookingName: "",
     bookingPhone: "",
     bookingEmail: "",
+    bookingPhoneCode: COUNTRY_DIAL_CODES["US"],
     // From address details
     fromCountry: "US",
     fromPostcode: "",
     fromCompany: "",
     fromContactName: "",
     fromPhone: "",
+    fromPhoneCode: COUNTRY_DIAL_CODES["US"],
     fromEmail: "",
     fromAddress1: "",
     fromAddress2: "",
@@ -51,6 +77,7 @@ export default function BookingFormPage() {
     toCompany: "",
     toContactName: "",
     toPhone: "",
+    toPhoneCode: COUNTRY_DIAL_CODES["US"],
     toEmail: "",
     toAddress1: "",
     toAddress2: "",
@@ -166,6 +193,30 @@ export default function BookingFormPage() {
     return () => observer.disconnect();
   }, []);
 
+  // Keep phone country codes in sync with selected countries
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      fromPhoneCode: COUNTRY_DIAL_CODES[prev.fromCountry] || prev.fromPhoneCode,
+    }));
+  }, [formData.fromCountry]);
+
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      toPhoneCode: COUNTRY_DIAL_CODES[prev.toCountry] || prev.toPhoneCode,
+    }));
+  }, [formData.toCountry]);
+
+  // Default booking contact phone code to match "From" country
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      bookingPhoneCode:
+        COUNTRY_DIAL_CODES[prev.fromCountry] || prev.bookingPhoneCode,
+    }));
+  }, [formData.fromCountry]);
+
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -259,7 +310,9 @@ export default function BookingFormPage() {
     const payload = {
       bookingContact: {
         name: formData.bookingName,
-        phone: formData.bookingPhone,
+        phone: `${formData.bookingPhoneCode || ""}${
+          formData.bookingPhone || ""
+        }`.trim(),
         email: formData.bookingEmail,
       },
       from: {
@@ -267,7 +320,9 @@ export default function BookingFormPage() {
         postcode: formData.fromPostcode,
         company: formData.fromCompany,
         contactName: formData.fromContactName,
-        phone: formData.fromPhone,
+        phone: `${formData.fromPhoneCode || ""}${
+          formData.fromPhone || ""
+        }`.trim(),
         email: formData.fromEmail,
         address1: formData.fromAddress1,
         address2: formData.fromAddress2,
@@ -282,7 +337,7 @@ export default function BookingFormPage() {
         postcode: formData.toPostcode,
         company: formData.toCompany,
         contactName: formData.toContactName,
-        phone: formData.toPhone,
+        phone: `${formData.toPhoneCode || ""}${formData.toPhone || ""}`.trim(),
         email: formData.toEmail,
         address1: formData.toAddress1,
         address2: formData.toAddress2,
@@ -426,14 +481,31 @@ export default function BookingFormPage() {
                     <label className="block text-sm font-medium text-[#324A6D] mb-2">
                       Phone
                     </label>
-                    <input
-                      type="tel"
-                      name="bookingPhone"
-                      value={formData.bookingPhone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      placeholder="+1 555 123 4567"
-                    />
+                    <div className="flex">
+                      <select
+                        name="bookingPhoneCode"
+                        value={formData.bookingPhoneCode}
+                        onChange={handleInputChange}
+                        className="w-28 sm:w-32 px-3 py-3 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                      >
+                        {Object.entries(COUNTRY_DIAL_CODES).map(
+                          ([iso, dial]) => (
+                            <option
+                              key={iso}
+                              value={dial}
+                            >{`${iso} ${dial}`}</option>
+                          )
+                        )}
+                      </select>
+                      <input
+                        type="tel"
+                        name="bookingPhone"
+                        value={formData.bookingPhone}
+                        onChange={handleInputChange}
+                        className="flex-1 px-4 py-3 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="555 123 4567"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#324A6D] mb-2">
@@ -491,14 +563,31 @@ export default function BookingFormPage() {
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
                         Phone
                       </label>
-                      <input
-                        type="tel"
-                        name="fromPhone"
-                        value={formData.fromPhone}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        placeholder="+1 555 123 4567"
-                      />
+                      <div className="flex">
+                        <select
+                          name="fromPhoneCode"
+                          value={formData.fromPhoneCode}
+                          onChange={handleInputChange}
+                          className="w-28 sm:w-32 px-3 py-3 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                        >
+                          {Object.entries(COUNTRY_DIAL_CODES).map(
+                            ([iso, dial]) => (
+                              <option
+                                key={iso}
+                                value={dial}
+                              >{`${iso} ${dial}`}</option>
+                            )
+                          )}
+                        </select>
+                        <input
+                          type="tel"
+                          name="fromPhone"
+                          value={formData.fromPhone}
+                          onChange={handleInputChange}
+                          className="flex-1 px-4 py-3 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                          placeholder="555 123 4567"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
@@ -682,14 +771,31 @@ export default function BookingFormPage() {
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
                         Phone
                       </label>
-                      <input
-                        type="tel"
-                        name="toPhone"
-                        value={formData.toPhone}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        placeholder="+44 20 1234 5678"
-                      />
+                      <div className="flex">
+                        <select
+                          name="toPhoneCode"
+                          value={formData.toPhoneCode}
+                          onChange={handleInputChange}
+                          className="w-28 sm:w-32 px-3 py-3 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                        >
+                          {Object.entries(COUNTRY_DIAL_CODES).map(
+                            ([iso, dial]) => (
+                              <option
+                                key={iso}
+                                value={dial}
+                              >{`${iso} ${dial}`}</option>
+                            )
+                          )}
+                        </select>
+                        <input
+                          type="tel"
+                          name="toPhone"
+                          value={formData.toPhone}
+                          onChange={handleInputChange}
+                          className="flex-1 px-4 py-3 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                          placeholder="1234 5678"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
