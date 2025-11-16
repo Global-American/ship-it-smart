@@ -24,11 +24,14 @@ interface Package {
   length: string;
   width: string;
   height: string;
-  items: Item[];
 }
 
 export default function BookingFormPage() {
   const [formData, setFormData] = useState({
+    // Booking contact details
+    bookingName: "",
+    bookingPhone: "",
+    bookingEmail: "",
     // From address details
     fromCountry: "US",
     fromPostcode: "",
@@ -61,6 +64,7 @@ export default function BookingFormPage() {
     dangerousGoods: false,
     dangerousGoodsCategory: "",
     requiresInsurance: false,
+    uploadDocuments: false,
     insuranceValue: "",
     insuranceCurrency: "USD",
     measurementUnit: "metric",
@@ -80,22 +84,32 @@ export default function BookingFormPage() {
       length: "",
       width: "",
       height: "",
-      items: [
-        {
-          id: "item-1",
-          description: "",
-          commodityCode: "",
-          sku: "",
-          quantity: "1",
-          value: "",
-          currency: "USD",
-          weight: "",
-          countryOfOrigin: "US",
-          manufacturerDetails: "",
-        },
-      ],
     },
   ]);
+
+  // Standalone items (not tied to packages)
+  const [items, setItems] = useState<Item[]>([
+    {
+      id: "item-1",
+      description: "",
+      commodityCode: "",
+      sku: "",
+      quantity: "1",
+      value: "",
+      currency: "USD",
+      weight: "",
+      countryOfOrigin: "US",
+      manufacturerDetails: "",
+    },
+  ]);
+
+  // Uploaded documents
+  const [documents, setDocuments] = useState<File[]>([]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    setDocuments(files);
+  };
 
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -155,24 +169,14 @@ export default function BookingFormPage() {
     );
   };
 
-  // Item handlers
+  // Item handlers (standalone)
   const handleItemChange = (
-    packageId: string,
     itemId: string,
     field: keyof Item,
     value: string
   ) => {
-    setPackages((prev) =>
-      prev.map((pkg) =>
-        pkg.id === packageId
-          ? {
-              ...pkg,
-              items: pkg.items.map((it) =>
-                it.id === itemId ? { ...it, [field]: value } : it
-              ),
-            }
-          : pkg
-      )
+    setItems((prev) =>
+      prev.map((it) => (it.id === itemId ? { ...it, [field]: value } : it))
     );
   };
 
@@ -185,20 +189,6 @@ export default function BookingFormPage() {
       length: "",
       width: "",
       height: "",
-      items: [
-        {
-          id: `item-${Date.now()}`,
-          description: "",
-          commodityCode: "",
-          sku: "",
-          quantity: "1",
-          value: "",
-          currency: "USD",
-          weight: "",
-          countryOfOrigin: "US",
-          manufacturerDetails: "",
-        },
-      ],
     };
     setPackages((prev) => [...prev, newPackage]);
   };
@@ -209,7 +199,7 @@ export default function BookingFormPage() {
     }
   };
 
-  const addItemToPackage = (packageId: string) => {
+  const addItem = () => {
     const newItem: Item = {
       id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       description: "",
@@ -222,26 +212,12 @@ export default function BookingFormPage() {
       countryOfOrigin: "US",
       manufacturerDetails: "",
     };
-    setPackages((prev) =>
-      prev.map((pkg) =>
-        pkg.id === packageId ? { ...pkg, items: [...pkg.items, newItem] } : pkg
-      )
-    );
+    setItems((prev) => [...prev, newItem]);
   };
 
-  const removeItemFromPackage = (packageId: string, itemId: string) => {
-    setPackages((prev) =>
-      prev.map((pkg) =>
-        pkg.id === packageId
-          ? {
-              ...pkg,
-              items:
-                pkg.items.length > 1
-                  ? pkg.items.filter((it) => it.id !== itemId)
-                  : pkg.items,
-            }
-          : pkg
-      )
+  const removeItem = (itemId: string) => {
+    setItems((prev) =>
+      prev.length > 1 ? prev.filter((i) => i.id !== itemId) : prev
     );
   };
 
@@ -260,6 +236,11 @@ export default function BookingFormPage() {
     }
     // Handle book shipment request
     const payload = {
+      bookingContact: {
+        name: formData.bookingName,
+        phone: formData.bookingPhone,
+        email: formData.bookingEmail,
+      },
       from: {
         country: formData.fromCountry,
         postcode: formData.fromPostcode,
@@ -300,14 +281,60 @@ export default function BookingFormPage() {
         dangerousGoods: formData.dangerousGoods,
         dangerousGoodsCategory: formData.dangerousGoodsCategory,
         requiresInsurance: formData.requiresInsurance,
+        uploadDocuments: formData.uploadDocuments,
         insuranceValue: formData.insuranceValue,
         insuranceCurrency: formData.insuranceCurrency,
         measurementUnit: formData.measurementUnit,
       },
       packages,
+      documents: documents.map((f) => ({
+        name: f.name,
+        size: f.size,
+        type: f.type,
+      })),
+      items,
     };
     console.log("Book Shipment Request:", payload);
   };
+
+  // Derived totals
+  const unitLabel = formData.measurementUnit === "metric" ? "kg" : "lbs";
+  const totalPackageWeight = packages.reduce((sum, pkg) => {
+    const qty = parseFloat(pkg.quantity || "0") || 0;
+    const wt = parseFloat(pkg.weight || "0") || 0;
+    return sum + qty * wt;
+  }, 0);
+
+  const totalsByCurrency = items.reduce((acc, it) => {
+    const qty = parseFloat(it.quantity || "0") || 0;
+    const val = parseFloat(it.value || "0") || 0;
+    const cur = it.currency || "USD";
+    acc[cur] = (acc[cur] || 0) + qty * val;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Stable server/client currency formatting to avoid hydration mismatches
+  const formatCurrency = (code: string, amount: number) => {
+    const map: Record<string, string> = {
+      USD: "$",
+      GBP: "£",
+      EUR: "€",
+      CAD: "CA$",
+      AUD: "A$",
+      JPY: "¥",
+    };
+    const symbol = map[code] ?? `${code} `;
+    // If symbol already ends with typical currency sign, no extra space
+    const needsSpace = /[A-Za-z]$/.test(symbol);
+    return `${symbol}${needsSpace ? " " : ""}${amount.toFixed(2)}`;
+  };
+
+  // Total weight based on items (quantity × weight)
+  const totalItemWeight = items.reduce((sum, it) => {
+    const qty = parseFloat(it.quantity || "0") || 0;
+    const wt = parseFloat(it.weight || "0") || 0;
+    return sum + qty * wt;
+  }, 0);
 
   return (
     <section
@@ -347,6 +374,53 @@ export default function BookingFormPage() {
             }}
           >
             <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
+              {/* Booking Contact Information */}
+              <div className="bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                <h4 className="text-xl font-semibold text-[#1F447B] mb-6">
+                  Booking Contact Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      name="bookingName"
+                      value={formData.bookingName}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      placeholder="Primary contact name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      name="bookingPhone"
+                      value={formData.bookingPhone}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      placeholder="+1 555 123 4567"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      name="bookingEmail"
+                      value={formData.bookingEmail}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      placeholder="contact@example.com"
+                    />
+                  </div>
+                </div>
+              </div>
               {/* Addresses */}
               <div className="space-y-10">
                 <div className="bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
@@ -383,34 +457,6 @@ export default function BookingFormPage() {
                     </div>
                   </div>
                   {/* New EORI / VAT-EIN Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        EORI Number
-                      </label>
-                      <input
-                        type="text"
-                        name="fromEori"
-                        value={formData.fromEori}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        placeholder="GB123456789000"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        VAT / EIN Number
-                      </label>
-                      <input
-                        type="text"
-                        name="fromVatEin"
-                        value={formData.fromVatEin}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        placeholder="VAT123456 / 12-3456789"
-                      />
-                    </div>
-                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
@@ -464,6 +510,34 @@ export default function BookingFormPage() {
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         placeholder="Suite / Unit / Apt"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        EORI Number
+                      </label>
+                      <input
+                        type="text"
+                        name="fromEori"
+                        value={formData.fromEori}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="GB123456789000"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        VAT / EIN Number
+                      </label>
+                      <input
+                        type="text"
+                        name="fromVatEin"
+                        value={formData.fromVatEin}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="VAT123456 / 12-3456789"
                       />
                     </div>
                   </div>
@@ -573,35 +647,7 @@ export default function BookingFormPage() {
                       />
                     </div>
                   </div>
-                  {/* New EORI / VAT-EIN Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        EORI Number
-                      </label>
-                      <input
-                        type="text"
-                        name="toEori"
-                        value={formData.toEori}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        placeholder="EU123456789000"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        VAT / EIN Number
-                      </label>
-                      <input
-                        type="text"
-                        name="toVatEin"
-                        value={formData.toVatEin}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        placeholder="VAT987654 / 98-7654321"
-                      />
-                    </div>
-                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                       <label className="block text-sm font-medium text-[#324A6D] mb-2">
@@ -655,6 +701,35 @@ export default function BookingFormPage() {
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         placeholder="Suite / Unit / Apt"
+                      />
+                    </div>
+                  </div>
+                  {/* New EORI / VAT-EIN Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        EORI Number
+                      </label>
+                      <input
+                        type="text"
+                        name="toEori"
+                        value={formData.toEori}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="EU123456789000"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        VAT / EIN Number
+                      </label>
+                      <input
+                        type="text"
+                        name="toVatEin"
+                        value={formData.toVatEin}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        placeholder="VAT987654 / 98-7654321"
                       />
                     </div>
                   </div>
@@ -732,228 +807,6 @@ export default function BookingFormPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Additional Options Toggles */}
-              <div>
-                <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
-                  Additional Options
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                    <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Residential Address
-                      </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Delivery to a residential location
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="residentialAddress"
-                        checked={formData.residentialAddress}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                    <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Request Pickup
-                      </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Schedule a pickup from your location
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="requestPickup"
-                        checked={formData.requestPickup}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                    <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Dangerous Goods
-                      </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Contains hazardous materials
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="dangerousGoods"
-                        checked={formData.dangerousGoods}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                    <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Requires Insurance
-                      </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Add insurance coverage
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="requiresInsurance"
-                        checked={formData.requiresInsurance}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pickup Details */}
-              {formData.requestPickup && (
-                <div className="bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
-                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
-                    Pickup Details
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Pickup Date
-                      </label>
-                      <input
-                        type="date"
-                        name="pickupDate"
-                        value={formData.pickupDate}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        required={formData.requestPickup}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Time Range (Local Time)
-                      </label>
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="time"
-                          name="pickupTimeStart"
-                          value={formData.pickupTimeStart}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                          required={formData.requestPickup}
-                        />
-                        <span className="text-[#324A6D]">→</span>
-                        <input
-                          type="time"
-                          name="pickupTimeEnd"
-                          value={formData.pickupTimeEnd}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                          required={formData.requestPickup}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Pickup Instructions
-                    </label>
-                    <textarea
-                      name="pickupInstructions"
-                      value={formData.pickupInstructions}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D] min-h-[80px]"
-                      placeholder="e.g., Call upon arrival, loading dock at rear"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Dangerous Goods Category Dropdown */}
-              {formData.dangerousGoods && (
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                    Dangerous Goods Category
-                  </label>
-                  <select
-                    name="dangerousGoodsCategory"
-                    value={formData.dangerousGoodsCategory}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                    required={formData.dangerousGoods}
-                  >
-                    <option value="">Select Category</option>
-                    <option value="DGR">DGR | Dangerous Goods</option>
-                    <option value="DRY_ICE">DRY_ICE | Dry Ice</option>
-                    <option value="LITHIUM">LITHIUM | Lithium Battery</option>
-                  </select>
-                  <p className="text-xs text-[#EB993C] mt-2 italic">
-                    Further documentation will be required prior to completion
-                    of shipment.
-                  </p>
-                </div>
-              )}
-
-              {/* Insurance Details */}
-              {formData.requiresInsurance && (
-                <div className="mt-4">
-                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
-                    Insurance Details
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Insurance Value
-                      </label>
-                      <input
-                        type="number"
-                        name="insuranceValue"
-                        value={formData.insuranceValue}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        step="0.01"
-                        required={formData.requiresInsurance}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Currency
-                      </label>
-                      <select
-                        name="insuranceCurrency"
-                        value={formData.insuranceCurrency}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        required={formData.requiresInsurance}
-                      >
-                        <option value="GBP">GBP - British Pound</option>
-                        <option value="USD">USD - US Dollar</option>
-                        <option value="EUR">EUR - Euro</option>
-                        <option value="CAD">CAD - Canadian Dollar</option>
-                        <option value="AUD">AUD - Australian Dollar</option>
-                        <option value="CHF">CHF - Swiss Franc</option>
-                        <option value="JPY">JPY - Japanese Yen</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Package Details */}
               <div>
@@ -1145,246 +998,6 @@ export default function BookingFormPage() {
                           />
                         </div>
                       </div>
-
-                      {/* Items within this package */}
-                      <div className="mt-8">
-                        <div className="flex justify-between items-center mb-2">
-                          <h5 className="text-md font-semibold text-[#1F447B]">
-                            Items
-                          </h5>
-                          <button
-                            type="button"
-                            onClick={() => addItemToPackage(pkg.id)}
-                            className="text-sm bg-[#1F447B] text-white px-3 py-1 rounded-md border-2 border-[#EB993C] hover:bg-[#173862] transition-colors"
-                          >
-                            + Add Item
-                          </button>
-                        </div>
-                        <div className="space-y-6">
-                          {pkg.items.map((item, itemIndex) => (
-                            <div
-                              key={item.id}
-                              className="p-4 rounded-lg border-2 border-[#1F447B]/40 bg-[#F4FAFC]"
-                            >
-                              <div className="flex justify-between items-center mb-4">
-                                <h6 className="font-medium text-[#1F447B]">
-                                  Item #{itemIndex + 1}
-                                </h6>
-                                {pkg.items.length > 1 && (
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      removeItemFromPackage(pkg.id, item.id)
-                                    }
-                                    className="text-xs text-[#EB993C] border border-[#EB993C] px-2 py-1 rounded hover:bg-[#EB993C]/10"
-                                  >
-                                    Remove
-                                  </button>
-                                )}
-                              </div>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                                {/* Row 1 */}
-                                <div>
-                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                    Description
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={item.description}
-                                    onChange={(e) =>
-                                      handleItemChange(
-                                        pkg.id,
-                                        item.id,
-                                        "description",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                    Commodity code
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={item.commodityCode}
-                                    onChange={(e) =>
-                                      handleItemChange(
-                                        pkg.id,
-                                        item.id,
-                                        "commodityCode",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                    SKU
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={item.sku}
-                                    onChange={(e) =>
-                                      handleItemChange(
-                                        pkg.id,
-                                        item.id,
-                                        "sku",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                    Quantity
-                                  </label>
-                                  <input
-                                    type="number"
-                                    min="1"
-                                    value={item.quantity}
-                                    onChange={(e) =>
-                                      handleItemChange(
-                                        pkg.id,
-                                        item.id,
-                                        "quantity",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
-                                  />
-                                </div>
-                                {/* Row 2 */}
-                                <div>
-                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                    Item Weight (
-                                    {formData.measurementUnit === "metric"
-                                      ? "kg"
-                                      : "lbs"}
-                                    )
-                                  </label>
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    value={item.weight}
-                                    onChange={(e) =>
-                                      handleItemChange(
-                                        pkg.id,
-                                        item.id,
-                                        "weight",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                    Item value
-                                  </label>
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    value={item.value}
-                                    onChange={(e) =>
-                                      handleItemChange(
-                                        pkg.id,
-                                        item.id,
-                                        "value",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                    Currency
-                                  </label>
-                                  <select
-                                    value={item.currency}
-                                    onChange={(e) =>
-                                      handleItemChange(
-                                        pkg.id,
-                                        item.id,
-                                        "currency",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
-                                  >
-                                    <option value="GBP">GBP - £</option>
-                                    <option value="USD">USD - $</option>
-                                    <option value="EUR">EUR - €</option>
-                                    <option value="CAD">CAD - $</option>
-                                    <option value="AUD">AUD - $</option>
-                                    <option value="JPY">JPY - ¥</option>
-                                  </select>
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                    Country of origin
-                                  </label>
-                                  <select
-                                    value={item.countryOfOrigin}
-                                    onChange={(e) =>
-                                      handleItemChange(
-                                        pkg.id,
-                                        item.id,
-                                        "countryOfOrigin",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
-                                  >
-                                    <option value="GB">United Kingdom</option>
-                                    <option value="US">United States</option>
-                                    <option value="CA">Canada</option>
-                                    <option value="AU">Australia</option>
-                                    <option value="DE">Germany</option>
-                                    <option value="FR">France</option>
-                                    <option value="IT">Italy</option>
-                                    <option value="ES">Spain</option>
-                                    <option value="NL">Netherlands</option>
-                                    <option value="BE">Belgium</option>
-                                    <option value="CH">Switzerland</option>
-                                    <option value="AT">Austria</option>
-                                    <option value="IE">Ireland</option>
-                                    <option value="DK">Denmark</option>
-                                    <option value="SE">Sweden</option>
-                                    <option value="NO">Norway</option>
-                                    <option value="FI">Finland</option>
-                                    <option value="PL">Poland</option>
-                                    <option value="CZ">Czech Republic</option>
-                                    <option value="HU">Hungary</option>
-                                  </select>
-                                </div>
-                              </div>
-                              <div>
-                                <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                                  Manufacturer details
-                                </label>
-                                <textarea
-                                  value={item.manufacturerDetails}
-                                  onChange={(e) =>
-                                    handleItemChange(
-                                      pkg.id,
-                                      item.id,
-                                      "manufacturerDetails",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 bg-white border border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D] min-h-[70px]"
-                                  placeholder="Factory info, batch numbers, etc."
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -1399,6 +1012,577 @@ export default function BookingFormPage() {
                     <span className="text-lg">+</span>
                     Add Another Package
                   </button>
+                </div>
+              </div>
+
+              {/* Items (Standalone) */}
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-semibold text-[#1F447B]">
+                    Item Details
+                  </h3>
+                </div>
+                <div className="space-y-6">
+                  {items.map((item, itemIndex) => (
+                    <div
+                      key={item.id}
+                      className="bg-white rounded-lg p-6 border"
+                    >
+                      <div className="flex justify-between items-center mb-4">
+                        <h6 className="font-medium text-[#1F447B]">
+                          Item #{itemIndex + 1}
+                        </h6>
+                        {items.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeItem(item.id)}
+                            className="text-xs text-[#EB993C] border border-[#EB993C] px-2 py-1 rounded hover:bg-[#EB993C]/10"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                        {/* Row 1 */}
+                        <div>
+                          <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                            Description
+                          </label>
+                          <input
+                            type="text"
+                            value={item.description}
+                            onChange={(e) =>
+                              handleItemChange(
+                                item.id,
+                                "description",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                            Commodity code
+                          </label>
+                          <input
+                            type="text"
+                            value={item.commodityCode}
+                            onChange={(e) =>
+                              handleItemChange(
+                                item.id,
+                                "commodityCode",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                            SKU
+                          </label>
+                          <input
+                            type="text"
+                            value={item.sku}
+                            onChange={(e) =>
+                              handleItemChange(item.id, "sku", e.target.value)
+                            }
+                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                            Quantity
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              handleItemChange(
+                                item.id,
+                                "quantity",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          />
+                        </div>
+                        {/* Row 2 */}
+                        <div>
+                          <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                            Item Weight (
+                            {formData.measurementUnit === "metric"
+                              ? "kg"
+                              : "lbs"}
+                            )
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={item.weight}
+                            onChange={(e) =>
+                              handleItemChange(
+                                item.id,
+                                "weight",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                            Item value
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={item.value}
+                            onChange={(e) =>
+                              handleItemChange(item.id, "value", e.target.value)
+                            }
+                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                            Currency
+                          </label>
+                          <select
+                            value={item.currency}
+                            onChange={(e) =>
+                              handleItemChange(
+                                item.id,
+                                "currency",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          >
+                            <option value="GBP">GBP - £</option>
+                            <option value="USD">USD - $</option>
+                            <option value="EUR">EUR - €</option>
+                            <option value="CAD">CAD - $</option>
+                            <option value="AUD">AUD - $</option>
+                            <option value="JPY">JPY - ¥</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                            Country of origin
+                          </label>
+                          <select
+                            value={item.countryOfOrigin}
+                            onChange={(e) =>
+                              handleItemChange(
+                                item.id,
+                                "countryOfOrigin",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          >
+                            <option value="GB">United Kingdom</option>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="AU">Australia</option>
+                            <option value="DE">Germany</option>
+                            <option value="FR">France</option>
+                            <option value="IT">Italy</option>
+                            <option value="ES">Spain</option>
+                            <option value="NL">Netherlands</option>
+                            <option value="BE">Belgium</option>
+                            <option value="CH">Switzerland</option>
+                            <option value="AT">Austria</option>
+                            <option value="IE">Ireland</option>
+                            <option value="DK">Denmark</option>
+                            <option value="SE">Sweden</option>
+                            <option value="NO">Norway</option>
+                            <option value="FI">Finland</option>
+                            <option value="PL">Poland</option>
+                            <option value="CZ">Czech Republic</option>
+                            <option value="HU">Hungary</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[#324A6D] mb-1">
+                          Manufacturer details
+                        </label>
+                        <textarea
+                          value={item.manufacturerDetails}
+                          onChange={(e) =>
+                            handleItemChange(
+                              item.id,
+                              "manufacturerDetails",
+                              e.target.value
+                            )
+                          }
+                          className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D] min-h-[70px]"
+                          placeholder="Factory info, batch numbers, etc."
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={addItem}
+                    className="bg-[#1F447B] hover:bg-[#1a3a6b] text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2 border-2 border-[#EB993C]"
+                  >
+                    <span className="text-lg">+</span>
+                    Add Another Item
+                  </button>
+                </div>
+              </div>
+
+              {/* Additional Options (moved after Packages and Items) */}
+              <div>
+                <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                  Additional Options
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
+                        Residential Address
+                      </label>
+                      <p className="text-xs text-[#EB993C] mt-1">
+                        Delivery to a residential location
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="residentialAddress"
+                        checked={formData.residentialAddress}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
+                        Request Pickup
+                      </label>
+                      <p className="text-xs text-[#EB993C] mt-1">
+                        Schedule a pickup from your location
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="requestPickup"
+                        checked={formData.requestPickup}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
+                        Dangerous Goods
+                      </label>
+                      <p className="text-xs text-[#EB993C] mt-1">
+                        Contains hazardous materials
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="dangerousGoods"
+                        checked={formData.dangerousGoods}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
+                        Requires Insurance
+                      </label>
+                      <p className="text-xs text-[#EB993C] mt-1">
+                        Add insurance coverage
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="requiresInsurance"
+                        checked={formData.requiresInsurance}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
+                        Upload Your Own Documents
+                      </label>
+                      <p className="text-xs text-[#EB993C] mt-1">
+                        Attach commercial invoice or other shipping docs
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="uploadDocuments"
+                        checked={formData.uploadDocuments}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Conditional blocks for Additional Options */}
+              {formData.requestPickup && (
+                <div className="bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                    Pickup Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Pickup Date
+                      </label>
+                      <input
+                        type="date"
+                        name="pickupDate"
+                        value={formData.pickupDate}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required={formData.requestPickup}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Time Range (Local Time)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="time"
+                          name="pickupTimeStart"
+                          value={formData.pickupTimeStart}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                          required={formData.requestPickup}
+                        />
+                        <span className="text-[#324A6D]">→</span>
+                        <input
+                          type="time"
+                          name="pickupTimeEnd"
+                          value={formData.pickupTimeEnd}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                          required={formData.requestPickup}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Pickup Instructions
+                    </label>
+                    <textarea
+                      name="pickupInstructions"
+                      value={formData.pickupInstructions}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D] min-h-[80px]"
+                      placeholder="e.g., Call upon arrival, loading dock at rear"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {formData.dangerousGoods && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                    Dangerous Goods Category
+                  </label>
+                  <select
+                    name="dangerousGoodsCategory"
+                    value={formData.dangerousGoodsCategory}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                    required={formData.dangerousGoods}
+                  >
+                    <option value="">Select Category</option>
+                    <option value="DGR">DGR | Dangerous Goods</option>
+                    <option value="DRY_ICE">DRY_ICE | Dry Ice</option>
+                    <option value="LITHIUM">LITHIUM | Lithium Battery</option>
+                  </select>
+                  <p className="text-xs text-[#EB993C] mt-2 italic">
+                    Further documentation will be required prior to completion
+                    of shipment.
+                  </p>
+                </div>
+              )}
+
+              {formData.requiresInsurance && (
+                <div className="mt-4">
+                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                    Insurance Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Insurance Value
+                      </label>
+                      <input
+                        type="number"
+                        name="insuranceValue"
+                        value={formData.insuranceValue}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        step="0.01"
+                        required={formData.requiresInsurance}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Currency
+                      </label>
+                      <select
+                        name="insuranceCurrency"
+                        value={formData.insuranceCurrency}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required={formData.requiresInsurance}
+                      >
+                        <option value="GBP">GBP - British Pound</option>
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="CAD">CAD - Canadian Dollar</option>
+                        <option value="AUD">AUD - Australian Dollar</option>
+                        <option value="CHF">CHF - Swiss Franc</option>
+                        <option value="JPY">JPY - Japanese Yen</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {formData.uploadDocuments && (
+                <div className="mt-4 bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                    Upload Documents
+                  </h3>
+                  <div>
+                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      Select files
+                    </label>
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleFileChange}
+                      className="block w-full text-sm text-[#324A6D] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1F447B] file:text-white hover:file:bg-[#1a3a6b]"
+                    />
+                    {documents.length > 0 && (
+                      <ul className="mt-3 space-y-1 text-xs text-[#324A6D]">
+                        {documents.map((f, i) => (
+                          <li key={i}>
+                            {f.name} ({Math.round(f.size / 1024)} KB)
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <p className="text-xs text-[#EB993C] mt-2">
+                    PDFs, images, or other relevant shipping documents.
+                  </p>
+                </div>
+              )}
+
+              {/* Totals Summary */}
+              <div className="mt-8 bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
+                <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                  Totals
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Item Weight */}
+                  <div className="bg-white rounded-lg p-5 border border-[#1F447B]/10 shadow-sm">
+                    <h4 className="text-sm font-medium text-[#324A6D] mb-1">
+                      Total Item Weight
+                    </h4>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-semibold text-[#1F447B]">
+                        {totalItemWeight.toFixed(2)}
+                      </span>
+                      <span className="text-sm text-[#324A6D] font-medium">
+                        {unitLabel}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#EB993C] mt-2">
+                      Items (quantity × weight)
+                    </p>
+                  </div>
+                  {/* Package Weight */}
+                  <div className="bg-white rounded-lg p-5 border border-[#1F447B]/10 shadow-sm">
+                    <h4 className="text-sm font-medium text-[#324A6D] mb-1">
+                      Total Package Weight
+                    </h4>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-semibold text-[#1F447B]">
+                        {totalPackageWeight.toFixed(2)}
+                      </span>
+                      <span className="text-sm text-[#324A6D] font-medium">
+                        {unitLabel}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#EB993C] mt-2">
+                      Packages (quantity × weight)
+                    </p>
+                  </div>
+                  {/* Item Value */}
+                  <div className="bg-white rounded-lg p-5 border border-[#1F447B]/10 shadow-sm">
+                    <h4 className="text-sm font-medium text-[#324A6D] mb-1">
+                      Total Item Value
+                    </h4>
+                    <div className="space-y-1 mt-1">
+                      {Object.keys(totalsByCurrency).length === 0 ? (
+                        <div className="text-3xl font-semibold text-[#1F447B]">
+                          {formatCurrency("USD", 0)}
+                        </div>
+                      ) : (
+                        Object.entries(totalsByCurrency).map(
+                          ([cur, amount]) => (
+                            <div
+                              key={cur}
+                              className="flex items-baseline gap-2"
+                            >
+                              <span className="text-2xl font-semibold text-[#1F447B]">
+                                {formatCurrency(cur, amount)}
+                              </span>
+                              <span className="text-[10px] tracking-wide text-[#324A6D]/70 uppercase">
+                                {cur}
+                              </span>
+                            </div>
+                          )
+                        )
+                      )}
+                    </div>
+                    <p className="text-xs text-[#EB993C] mt-2">
+                      Items (quantity × value)
+                    </p>
+                  </div>
                 </div>
               </div>
 
