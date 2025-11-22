@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import ColorPicker from "../../components/ColorPicker";
 
 export default function IntegrationsPage() {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
@@ -262,12 +261,6 @@ export default function IntegrationsPage() {
       className="py-20 md:py-28 lg:py-36"
       style={{ backgroundColor: bgColor }}
     >
-      <ColorPicker
-        onColorChange={setBgColor}
-        onContainerColorChange={setContainerColor}
-        currentColor={bgColor}
-        currentContainerColor={containerColor}
-      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div
           ref={headerRef}

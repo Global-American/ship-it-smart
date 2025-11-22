@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import ColorPicker from "../../components/ColorPicker";
 
 interface Package {
   id: string;
@@ -127,12 +126,6 @@ export default function QuotePage() {
       className="py-20 md:py-28 lg:py-36"
       style={{ backgroundColor: bgColor }}
     >
-      <ColorPicker
-        onColorChange={setBgColor}
-        onContainerColorChange={setContainerColor}
-        currentColor={bgColor}
-        currentContainerColor={containerColor}
-      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div

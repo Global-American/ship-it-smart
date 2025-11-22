@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ColorPicker from "./ColorPicker";
 
 interface LayoutClientProps {
   children: React.ReactNode;
@@ -31,13 +30,5 @@ export default function LayoutClient({ children }: LayoutClientProps) {
     };
   }, [backgroundColor]);
 
-  return (
-    <>
-      <ColorPicker
-        onColorChange={handleColorChange}
-        currentColor={backgroundColor}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
