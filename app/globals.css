@@ -231,6 +231,16 @@
   }
 }
 
+/* Ensure focused form fields use orange border */
+@layer base {
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #eb993c !important;
+    outline: none;
+  }
+}
+
 /* Mobile optimizations */
 @layer utilities {
   /* Prevent horizontal scrolling */
@@ -253,4 +263,19 @@
   100% {
     transform: translateX(-50%);
   }
+}
+
+/* Pulsating red border for validation errors */
+@keyframes pulse-border-red {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35);
+  }
+}
+.border-pulse-red {
+  animation: pulse-border-red 1.2s ease-in-out infinite;
+  border-color: #dc2626 !important;
 }

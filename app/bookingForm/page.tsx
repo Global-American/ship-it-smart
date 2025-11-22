@@ -295,6 +295,17 @@ export default function BookingFormPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Block submit if validation fails
+    if (weightValidationError) {
+      alert(
+        `Cannot book shipment: total item weight (${totalItemWeight.toFixed(
+          2
+        )} ${unitLabel}) exceeds total package weight (${totalPackageWeight.toFixed(
+          2
+        )} ${unitLabel}). Adjust weights or add packages.`
+      );
+      return;
+    }
     // Basic validation for pickup range
     if (formData.requestPickup) {
       if (
@@ -420,6 +431,9 @@ export default function BookingFormPage() {
     return sum + qty * wt;
   }, 0);
 
+  // Validation: total item weight must not exceed total package weight
+  const weightValidationError = totalItemWeight > totalPackageWeight;
+
   return (
     <section
       className="py-20 md:py-28 lg:py-36"
@@ -463,7 +477,7 @@ export default function BookingFormPage() {
                 <h4 className="text-xl font-semibold text-[#1F447B] mb-6">
                   Booking Contact Information
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-[#324A6D] mb-2">
                       Name
@@ -473,7 +487,7 @@ export default function BookingFormPage() {
                       name="bookingName"
                       value={formData.bookingName}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full h-13 px-5 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       placeholder="Primary contact name"
                     />
                   </div>
@@ -481,12 +495,12 @@ export default function BookingFormPage() {
                     <label className="block text-sm font-medium text-[#324A6D] mb-2">
                       Phone
                     </label>
-                    <div className="flex">
+                    <div className="flex w-full">
                       <select
                         name="bookingPhoneCode"
                         value={formData.bookingPhoneCode}
                         onChange={handleInputChange}
-                        className="w-28 sm:w-32 px-3 py-3 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                        className="h-13 w-28 sm:w-32 px-3 pr-8 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
                       >
                         {Object.entries(COUNTRY_DIAL_CODES).map(
                           ([iso, dial]) => (
@@ -502,7 +516,7 @@ export default function BookingFormPage() {
                         name="bookingPhone"
                         value={formData.bookingPhone}
                         onChange={handleInputChange}
-                        className="flex-1 px-4 py-3 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        className="h-13 flex-1 px-5 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         placeholder="555 123 4567"
                       />
                     </div>
@@ -516,7 +530,7 @@ export default function BookingFormPage() {
                       name="bookingEmail"
                       value={formData.bookingEmail}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      className="w-full h-13 px-5 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       placeholder="contact@example.com"
                     />
                   </div>
@@ -568,7 +582,7 @@ export default function BookingFormPage() {
                           name="fromPhoneCode"
                           value={formData.fromPhoneCode}
                           onChange={handleInputChange}
-                          className="w-28 sm:w-32 px-3 py-3 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          className="h-13 w-28 sm:w-32 px-3 pr-8 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
                         >
                           {Object.entries(COUNTRY_DIAL_CODES).map(
                             ([iso, dial]) => (
@@ -584,7 +598,7 @@ export default function BookingFormPage() {
                           name="fromPhone"
                           value={formData.fromPhone}
                           onChange={handleInputChange}
-                          className="flex-1 px-4 py-3 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                          className="h-13 flex-1 px-5 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                           placeholder="555 123 4567"
                         />
                       </div>
@@ -705,7 +719,7 @@ export default function BookingFormPage() {
                         name="fromCountry"
                         value={formData.fromCountry}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        className="w-full h-13 px-4 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         required
                       >
                         <option value="GB">United Kingdom</option>
@@ -776,7 +790,7 @@ export default function BookingFormPage() {
                           name="toPhoneCode"
                           value={formData.toPhoneCode}
                           onChange={handleInputChange}
-                          className="w-28 sm:w-32 px-3 py-3 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                          className="h-13 w-28 sm:w-32 px-3 pr-8 bg-white border-2 border-[#1F447B] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
                         >
                           {Object.entries(COUNTRY_DIAL_CODES).map(
                             ([iso, dial]) => (
@@ -792,7 +806,7 @@ export default function BookingFormPage() {
                           name="toPhone"
                           value={formData.toPhone}
                           onChange={handleInputChange}
-                          className="flex-1 px-4 py-3 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                          className="h-13 flex-1 px-5 bg-white border-2 border-l-0 border-[#1F447B] rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                           placeholder="1234 5678"
                         />
                       </div>
@@ -914,7 +928,7 @@ export default function BookingFormPage() {
                         name="toCountry"
                         value={formData.toCountry}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        className="w-full h-13 px-4 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         required
                       >
                         <option value="GB">United Kingdom</option>
@@ -1036,7 +1050,7 @@ export default function BookingFormPage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-4 py-3 pr-12 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                            className="w-full h-13 px-4 py-3 pr-12 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                           >
                             <option value="envelope">Envelope</option>
                             <option value="packet">Packet</option>
@@ -1178,20 +1192,16 @@ export default function BookingFormPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                        {/* Row 1 */}
+                        {/* Row 1 - reordered to SKU, Commodity code, Description */}
                         <div>
                           <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                            Description
+                            SKU
                           </label>
                           <input
                             type="text"
-                            value={item.description}
+                            value={item.sku}
                             onChange={(e) =>
-                              handleItemChange(
-                                item.id,
-                                "description",
-                                e.target.value
-                              )
+                              handleItemChange(item.id, "sku", e.target.value)
                             }
                             className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
                           />
@@ -1215,13 +1225,17 @@ export default function BookingFormPage() {
                         </div>
                         <div>
                           <label className="block text-xs font-medium text-[#324A6D] mb-1">
-                            SKU
+                            Description
                           </label>
                           <input
                             type="text"
-                            value={item.sku}
+                            value={item.description}
                             onChange={(e) =>
-                              handleItemChange(item.id, "sku", e.target.value)
+                              handleItemChange(
+                                item.id,
+                                "description",
+                                e.target.value
+                              )
                             }
                             className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
                           />
@@ -1294,7 +1308,7 @@ export default function BookingFormPage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                            className="w-full h-11 px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
                           >
                             <option value="GBP">GBP - £</option>
                             <option value="USD">USD - $</option>
@@ -1317,7 +1331,7 @@ export default function BookingFormPage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                            className="w-full h-11 px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
                           >
                             <option value="GB">United Kingdom</option>
                             <option value="US">United States</option>
@@ -1488,7 +1502,7 @@ export default function BookingFormPage() {
                   <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
                     <div>
                       <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Email Notifications
+                        Additional Email Notifications
                       </label>
                       <p className="text-xs text-[#EB993C] mt-1">
                         Send shipment updates to up to 5 emails
@@ -1670,7 +1684,7 @@ export default function BookingFormPage() {
               {formData.emailNotifications && (
                 <div className="mt-4 bg-white/50 rounded-xl p-6 border border-[#1F447B]/20">
                   <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
-                    Email Notifications
+                    Additional Email Notifications
                   </h3>
                   <div className="space-y-3">
                     {notifyEmails.map((email, idx) => (
@@ -1719,7 +1733,13 @@ export default function BookingFormPage() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Item Weight */}
-                  <div className="bg-white rounded-lg p-5 border border-[#1F447B]/10 shadow-sm">
+                  <div
+                    className={`bg-white rounded-lg p-5 border shadow-sm ${
+                      weightValidationError
+                        ? "border-red-500 border-pulse-red"
+                        : "border-[#1F447B]/10"
+                    }`}
+                  >
                     <h4 className="text-sm font-medium text-[#324A6D] mb-1">
                       Total Item Weight
                     </h4>
@@ -1736,7 +1756,13 @@ export default function BookingFormPage() {
                     </p>
                   </div>
                   {/* Package Weight */}
-                  <div className="bg-white rounded-lg p-5 border border-[#1F447B]/10 shadow-sm">
+                  <div
+                    className={`bg-white rounded-lg p-5 border shadow-sm ${
+                      weightValidationError
+                        ? "border-red-500 border-pulse-red"
+                        : "border-[#1F447B]/10"
+                    }`}
+                  >
                     <h4 className="text-sm font-medium text-[#324A6D] mb-1">
                       Total Package Weight
                     </h4>
@@ -1785,6 +1811,18 @@ export default function BookingFormPage() {
                     </p>
                   </div>
                 </div>
+                {weightValidationError && (
+                  <div
+                    className="mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 font-medium"
+                    role="alert"
+                    aria-live="assertive"
+                  >
+                    Warning: Total item weight ({totalItemWeight.toFixed(2)}{" "}
+                    {unitLabel}) exceeds total package weight (
+                    {totalPackageWeight.toFixed(2)} {unitLabel}). Adjust weights
+                    or add packages before booking.
+                  </div>
+                )}
               </div>
 
               {/* Reference Details (before Submit) */}
@@ -1850,9 +1888,20 @@ export default function BookingFormPage() {
 
               {/* Submit Button */}
               <div className="text-center">
+                {weightValidationError && (
+                  <div className="mb-4 text-sm text-red-700 font-medium">
+                    Cannot book shipment: item weight exceeds package weight.
+                    Adjust weights before proceeding.
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="bg-[#EB993C] hover:bg-[#d4822a] text-white font-semibold px-12 py-4 rounded-lg text-lg transition-colors duration-200 border-2 border-[#1F447B]"
+                  disabled={weightValidationError}
+                  className={`bg-[#EB993C] hover:bg-[#d4822a] text-white font-semibold px-12 py-4 rounded-lg text-lg transition-colors duration-200 border-2 border-[#1F447B] ${
+                    weightValidationError
+                      ? "opacity-60 cursor-not-allowed hover:bg-[#EB993C]"
+                      : ""
+                  }`}
                 >
                   Book Shipment
                 </button>
