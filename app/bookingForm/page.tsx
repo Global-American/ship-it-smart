@@ -270,9 +270,20 @@ export default function BookingFormPage() {
     field: keyof Item,
     value: string
   ) => {
-    setItems((prev) =>
-      prev.map((it) => (it.id === itemId ? { ...it, [field]: value } : it))
-    );
+    setItems((prev) => {
+      // If changing currency on the first item, update all items
+      if (field === "currency") {
+        const itemIndex = prev.findIndex((it) => it.id === itemId);
+        if (itemIndex === 0) {
+          // First item - update all items to the new currency
+          return prev.map((it) => ({ ...it, currency: value }));
+        }
+      }
+      // For other fields or non-first items, just update the specific item
+      return prev.map((it) =>
+        it.id === itemId ? { ...it, [field]: value } : it
+      );
+    });
   };
 
   const addPackage = () => {
@@ -295,6 +306,9 @@ export default function BookingFormPage() {
   };
 
   const addItem = () => {
+    // Use the first item's currency if items exist, otherwise default to USD
+    const inheritedCurrency = items.length > 0 ? items[0].currency : "USD";
+
     const newItem: Item = {
       id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       description: "",
@@ -302,7 +316,7 @@ export default function BookingFormPage() {
       sku: "",
       quantity: "1",
       value: "",
-      currency: "USD",
+      currency: inheritedCurrency,
       weight: "",
       countryOfOrigin: "US",
       manufacturerDetails: "",
@@ -423,10 +437,13 @@ export default function BookingFormPage() {
     return sum + qty * wt;
   }, 0);
 
+  // Get the first item's currency as the base currency
+  const baseCurrency = items.length > 0 ? items[0].currency || "USD" : "USD";
+
   const totalsByCurrency = items.reduce((acc, it) => {
     const qty = parseFloat(it.quantity || "0") || 0;
     const val = parseFloat(it.value || "0") || 0;
-    const cur = it.currency || "USD";
+    const cur = baseCurrency; // Use base currency instead of individual item currency
     acc[cur] = (acc[cur] || 0) + qty * val;
     return acc;
   }, {} as Record<string, number>);
@@ -1629,7 +1646,8 @@ export default function BookingFormPage() {
                                 e.target.value
                               )
                             }
-                            className="w-full h-11 px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
+                            disabled={itemIndex > 0}
+                            className="w-full h-11 px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D] disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <option value="GBP">GBP - £</option>
                             <option value="USD">USD - $</option>
@@ -1638,6 +1656,11 @@ export default function BookingFormPage() {
                             <option value="AUD">AUD - $</option>
                             <option value="JPY">JPY - ¥</option>
                           </select>
+                          {itemIndex > 0 && (
+                            <p className="text-xs text-[#324A6D]/60 mt-1">
+                              Locked to Item 1 currency
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-xs font-medium text-[#324A6D] mb-1">
@@ -1772,26 +1795,22 @@ export default function BookingFormPage() {
                       Total Item Value
                     </h4>
                     <div className="space-y-1 mt-1">
-                      {Object.keys(totalsByCurrency).length === 0 ? (
+                      {items.length === 0 ? (
                         <div className="text-3xl font-semibold text-[#1F447B]">
                           {formatCurrency("USD", 0)}
                         </div>
                       ) : (
-                        Object.entries(totalsByCurrency).map(
-                          ([cur, amount]) => (
-                            <div
-                              key={cur}
-                              className="flex items-baseline gap-2"
-                            >
-                              <span className="text-2xl font-semibold text-[#1F447B]">
-                                {formatCurrency(cur, amount)}
-                              </span>
-                              <span className="text-[10px] tracking-wide text-[#324A6D]/70 uppercase">
-                                {cur}
-                              </span>
-                            </div>
-                          )
-                        )
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-semibold text-[#1F447B]">
+                            {formatCurrency(
+                              baseCurrency,
+                              totalsByCurrency[baseCurrency] || 0
+                            )}
+                          </span>
+                          <span className="text-[10px] tracking-wide text-[#324A6D]/70 uppercase">
+                            {baseCurrency}
+                          </span>
+                        </div>
                       )}
                     </div>
                     <p className="text-xs text-[#EB993C] mt-2">

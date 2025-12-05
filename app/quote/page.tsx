@@ -28,6 +28,9 @@ export default function QuotePage() {
     measurementUnit: "metric",
   });
 
+  // Package shipment type: 'cartons' or 'pallets'
+  const [packageShipmentType, setPackageShipmentType] = useState<string>("");
+
   const [packages, setPackages] = useState<Package[]>([
     {
       id: "1",
@@ -100,7 +103,7 @@ export default function QuotePage() {
     const newPackage: Package = {
       id: Date.now().toString(),
       quantity: "1",
-      packageType: "parcel",
+      packageType: packageShipmentType === "pallets" ? "pallet" : "parcel",
       weight: "",
       length: "",
       width: "",
@@ -430,7 +433,9 @@ export default function QuotePage() {
               <div>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-semibold text-[#1F447B]">
-                    Package Details
+                    {packageShipmentType === "pallets"
+                      ? "Pallet Details"
+                      : "Package Details"}
                   </h3>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-4">
@@ -464,173 +469,245 @@ export default function QuotePage() {
                   </div>
                 </div>
 
-                {/* Multiple Packages */}
-                <div className="space-y-6">
-                  {packages.map((pkg, index) => (
-                    <div
-                      key={pkg.id}
-                      className="bg-white rounded-lg p-6 border"
+                {/* Package Type Selection */}
+                <div className="mb-6 bg-white rounded-lg p-6 border border-[#1F447B]/20">
+                  <h4 className="text-lg font-semibold text-[#1F447B] mb-4">
+                    What are you shipping?
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setPackageShipmentType("cartons")}
+                      className={`p-6 rounded-lg border-2 transition-all ${
+                        packageShipmentType === "cartons"
+                          ? "border-[#EB993C] bg-[#EB993C]/10"
+                          : "border-[#1F447B]/20 hover:border-[#1F447B]/40"
+                      }`}
                     >
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-lg font-medium text-[#1F447B]">
-                          Package {index + 1}
-                        </h4>
-                        {packages.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removePackage(pkg.id)}
-                            className="text-[#EB993C] hover:text-[#d4822a] px-3 py-1 text-sm border border-[#EB993C] rounded-md hover:bg-[#EB993C]/10 transition-colors"
-                          >
-                            Remove
-                          </button>
-                        )}
+                      <div className="text-center">
+                        <h5 className="text-lg font-semibold text-[#1F447B] mb-2">
+                          Cartons / Packages
+                        </h5>
+                        <p className="text-sm text-[#324A6D]">
+                          Individual parcels, boxes, or envelopes
+                        </p>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                            Quantity
-                          </label>
-                          <input
-                            type="number"
-                            value={pkg.quantity}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                pkg.id,
-                                "quantity",
-                                e.target.value
-                              )
-                            }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            placeholder="1"
-                            min="1"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                            Package Type
-                          </label>
-                          <select
-                            value={pkg.packageType}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                pkg.id,
-                                "packageType",
-                                e.target.value
-                              )
-                            }
-                            className="w-full px-4 py-3 pr-12 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                          >
-                            <option value="envelope">Envelope</option>
-                            <option value="packet">Packet</option>
-                            <option value="parcel">Parcel</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                            Weight (
-                            {formData.measurementUnit === "metric"
-                              ? "kg"
-                              : "lbs"}
-                            )
-                          </label>
-                          <input
-                            type="number"
-                            value={pkg.weight}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                pkg.id,
-                                "weight",
-                                e.target.value
-                              )
-                            }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            step="0.1"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                            Length (
-                            {formData.measurementUnit === "metric"
-                              ? "cm"
-                              : "in"}
-                            )
-                          </label>
-                          <input
-                            type="number"
-                            value={pkg.length}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                pkg.id,
-                                "length",
-                                e.target.value
-                              )
-                            }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                            Width (
-                            {formData.measurementUnit === "metric"
-                              ? "cm"
-                              : "in"}
-                            )
-                          </label>
-                          <input
-                            type="number"
-                            value={pkg.width}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                pkg.id,
-                                "width",
-                                e.target.value
-                              )
-                            }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                            Height (
-                            {formData.measurementUnit === "metric"
-                              ? "cm"
-                              : "in"}
-                            )
-                          </label>
-                          <input
-                            type="number"
-                            value={pkg.height}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                pkg.id,
-                                "height",
-                                e.target.value
-                              )
-                            }
-                            className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                            required
-                          />
-                        </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPackageShipmentType("pallets")}
+                      className={`p-6 rounded-lg border-2 transition-all ${
+                        packageShipmentType === "pallets"
+                          ? "border-[#EB993C] bg-[#EB993C]/10"
+                          : "border-[#1F447B]/20 hover:border-[#1F447B]/40"
+                      }`}
+                    >
+                      <div className="text-center">
+                        <h5 className="text-lg font-semibold text-[#1F447B] mb-2">
+                          Pallets / Skids
+                        </h5>
+                        <p className="text-sm text-[#324A6D]">
+                          Palletized freight or skids
+                        </p>
                       </div>
-                    </div>
-                  ))}
+                    </button>
+                  </div>
                 </div>
 
-                {/* Add Package Button */}
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    onClick={addPackage}
-                    className="bg-[#1F447B] hover:bg-[#1a3a6b] text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2 border-2 border-[#EB993C]"
-                  >
-                    <span className="text-lg">+</span>
-                    Add Another Package
-                  </button>
-                </div>
+                {/* Multiple Packages - Only show when type is selected */}
+                {packageShipmentType && (
+                  <div className="space-y-6">
+                    {packages.map((pkg, index) => (
+                      <div
+                        key={pkg.id}
+                        className="bg-white rounded-lg p-6 border"
+                      >
+                        <div className="flex justify-between items-center mb-4">
+                          <h4 className="text-lg font-medium text-[#1F447B]">
+                            {packageShipmentType === "pallets"
+                              ? `Pallet ${index + 1}`
+                              : `Package ${index + 1}`}
+                          </h4>
+                          {packages.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removePackage(pkg.id)}
+                              className="text-[#EB993C] hover:text-[#d4822a] px-3 py-1 text-sm border border-[#EB993C] rounded-md hover:bg-[#EB993C]/10 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                        <div
+                          className={`grid grid-cols-1 md:grid-cols-3 ${
+                            packageShipmentType === "cartons"
+                              ? "lg:grid-cols-6"
+                              : "lg:grid-cols-5"
+                          } gap-4`}
+                        >
+                          <div>
+                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                              Quantity
+                            </label>
+                            <input
+                              type="number"
+                              value={pkg.quantity}
+                              onChange={(e) =>
+                                handlePackageChange(
+                                  pkg.id,
+                                  "quantity",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                              placeholder="1"
+                              min="1"
+                              required
+                            />
+                          </div>
+                          {packageShipmentType === "cartons" && (
+                            <div>
+                              <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                                Package Type
+                              </label>
+                              <select
+                                value={pkg.packageType}
+                                onChange={(e) =>
+                                  handlePackageChange(
+                                    pkg.id,
+                                    "packageType",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-4 py-3 pr-12 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                              >
+                                <option value="envelope">Envelope</option>
+                                <option value="packet">Packet</option>
+                                <option value="parcel">Parcel</option>
+                              </select>
+                            </div>
+                          )}
+                          <div>
+                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                              {packageShipmentType === "pallets"
+                                ? "Pallet"
+                                : "Package"}{" "}
+                              Weight (
+                              {formData.measurementUnit === "metric"
+                                ? "kg"
+                                : "lbs"}
+                              )
+                            </label>
+                            <input
+                              type="number"
+                              value={pkg.weight}
+                              onChange={(e) =>
+                                handlePackageChange(
+                                  pkg.id,
+                                  "weight",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                              step="0.1"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                              {packageShipmentType === "pallets"
+                                ? "Pallet"
+                                : "Package"}{" "}
+                              Length (
+                              {formData.measurementUnit === "metric"
+                                ? "cm"
+                                : "in"}
+                              )
+                            </label>
+                            <input
+                              type="number"
+                              value={pkg.length}
+                              onChange={(e) =>
+                                handlePackageChange(
+                                  pkg.id,
+                                  "length",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                              {packageShipmentType === "pallets"
+                                ? "Pallet"
+                                : "Package"}{" "}
+                              Width (
+                              {formData.measurementUnit === "metric"
+                                ? "cm"
+                                : "in"}
+                              )
+                            </label>
+                            <input
+                              type="number"
+                              value={pkg.width}
+                              onChange={(e) =>
+                                handlePackageChange(
+                                  pkg.id,
+                                  "width",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                              {packageShipmentType === "pallets"
+                                ? "Pallet"
+                                : "Package"}{" "}
+                              Height (
+                              {formData.measurementUnit === "metric"
+                                ? "cm"
+                                : "in"}
+                              )
+                            </label>
+                            <input
+                              type="number"
+                              value={pkg.height}
+                              onChange={(e) =>
+                                handlePackageChange(
+                                  pkg.id,
+                                  "height",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Add Package Button */}
+                    <div className="mt-4">
+                      <button
+                        type="button"
+                        onClick={addPackage}
+                        className="bg-[#1F447B] hover:bg-[#1a3a6b] text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2 border-2 border-[#EB993C]"
+                      >
+                        <span className="text-lg">+</span>
+                        Add Another{" "}
+                        {packageShipmentType === "pallets"
+                          ? "Pallet"
+                          : "Package"}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -658,7 +735,7 @@ export default function QuotePage() {
         >
           <div className="text-center">
             <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
-              <span className="text-[#1F447B] text-2xl font-bold">£</span>
+              <span className="text-[#1F447B] text-2xl font-bold">$</span>
             </div>
             <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
               Best Rates
