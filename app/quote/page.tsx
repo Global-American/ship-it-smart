@@ -13,6 +13,9 @@ interface Package {
 }
 
 export default function QuotePage() {
+  const BOOKINGS_API_BASE =
+    process.env.NEXT_PUBLIC_BOOKINGS_API_BASE || "http://localhost:3001";
+
   const [formData, setFormData] = useState({
     fromPostcode: "",
     fromCountry: "US",
@@ -67,7 +70,7 @@ export default function QuotePage() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     if (headerRef.current) observer.observe(headerRef.current);
@@ -78,7 +81,7 @@ export default function QuotePage() {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
     setFormData((prev) => ({
@@ -90,12 +93,12 @@ export default function QuotePage() {
   const handlePackageChange = (
     packageId: string,
     field: keyof Package,
-    value: string
+    value: string,
   ) => {
     setPackages((prev) =>
       prev.map((pkg) =>
-        pkg.id === packageId ? { ...pkg, [field]: value } : pkg
-      )
+        pkg.id === packageId ? { ...pkg, [field]: value } : pkg,
+      ),
     );
   };
 
@@ -118,10 +121,76 @@ export default function QuotePage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle quote request
-    console.log("Quote request:", { ...formData, packages });
+
+    // Create payload for quote request
+    const payload = {
+      from: {
+        country: formData.fromCountry,
+        postcode: formData.fromPostcode,
+      },
+      to: {
+        country: formData.toCountry,
+        postcode: formData.toPostcode,
+      },
+      options: {
+        residentialAddress: formData.residentialAddress,
+        requestPickup: formData.requestPickup,
+        dangerousGoods: formData.dangerousGoods,
+        dangerousGoodsCategory: formData.dangerousGoodsCategory,
+        requiresInsurance: formData.requiresInsurance,
+        insuranceValue: formData.insuranceValue,
+        insuranceCurrency: formData.insuranceCurrency,
+        measurementUnit: formData.measurementUnit,
+      },
+      packageShipmentType,
+      packages,
+    };
+
+    try {
+      const response = await fetch(`${BOOKINGS_API_BASE}/api/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type_of_form: "quote",
+          form_data: payload,
+          location: "Ship It Smart",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to submit quote request: ${response.statusText}`,
+        );
+      }
+
+      const result = await response.json();
+      await fetch("/api/quote-notification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          form_data: payload,
+          booking_id: result?.data?.id,
+          location: "Ship It Smart",
+        }),
+      }).catch((notifyError) => {
+        console.error("Quote email notification failed:", notifyError);
+      });
+
+      console.log("Quote request submitted successfully:", result);
+      alert("Quote request submitted successfully!");
+
+      // Optionally reset form or redirect
+      // window.location.href = '/quote/success';
+    } catch (error) {
+      console.error("Error submitting quote request:", error);
+      alert("Failed to submit quote request. Please try again.");
+    }
   };
 
   return (
@@ -556,7 +625,7 @@ export default function QuotePage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "quantity",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -576,7 +645,7 @@ export default function QuotePage() {
                                   handlePackageChange(
                                     pkg.id,
                                     "packageType",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                                 className="w-full px-4 py-3 pr-12 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -605,7 +674,7 @@ export default function QuotePage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "weight",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -631,7 +700,7 @@ export default function QuotePage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "length",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -656,7 +725,7 @@ export default function QuotePage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "width",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -681,7 +750,7 @@ export default function QuotePage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "height",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"

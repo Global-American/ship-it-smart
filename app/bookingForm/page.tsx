@@ -206,7 +206,7 @@ export default function BookingFormPage() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     if (headerRef.current) observer.observe(headerRef.current);
@@ -243,7 +243,7 @@ export default function BookingFormPage() {
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
     setFormData((prev) => ({
@@ -255,12 +255,12 @@ export default function BookingFormPage() {
   const handlePackageChange = (
     packageId: string,
     field: keyof Package,
-    value: string
+    value: string,
   ) => {
     setPackages((prev) =>
       prev.map((pkg) =>
-        pkg.id === packageId ? { ...pkg, [field]: value } : pkg
-      )
+        pkg.id === packageId ? { ...pkg, [field]: value } : pkg,
+      ),
     );
   };
 
@@ -268,7 +268,7 @@ export default function BookingFormPage() {
   const handleItemChange = (
     itemId: string,
     field: keyof Item,
-    value: string
+    value: string,
   ) => {
     setItems((prev) => {
       // If changing currency on the first item, update all items
@@ -281,7 +281,7 @@ export default function BookingFormPage() {
       }
       // For other fields or non-first items, just update the specific item
       return prev.map((it) =>
-        it.id === itemId ? { ...it, [field]: value } : it
+        it.id === itemId ? { ...it, [field]: value } : it,
       );
     });
   };
@@ -326,20 +326,20 @@ export default function BookingFormPage() {
 
   const removeItem = (itemId: string) => {
     setItems((prev) =>
-      prev.length > 1 ? prev.filter((i) => i.id !== itemId) : prev
+      prev.length > 1 ? prev.filter((i) => i.id !== itemId) : prev,
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Block submit if validation fails
     if (weightValidationError) {
       alert(
         `Cannot book shipment: total item weight (${totalItemWeight.toFixed(
-          2
+          2,
         )} ${unitLabel}) exceeds total package weight (${totalPackageWeight.toFixed(
-          2
-        )} ${unitLabel}). Adjust weights or add packages.`
+          2,
+        )} ${unitLabel}). Adjust weights or add packages.`,
       );
       return;
     }
@@ -426,7 +426,34 @@ export default function BookingFormPage() {
         invoiceNumber: formData.invoiceNumber,
       },
     };
-    console.log("Book Shipment Request:", payload);
+
+    try {
+      const response = await fetch("http://localhost:3001/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type_of_form: "booking",
+          form_data: payload,
+          location: `Ship It Smart`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to submit booking: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log("Booking submitted successfully:", result);
+      alert("Booking submitted successfully!");
+
+      // Optionally reset form or redirect
+      // window.location.href = '/bookings/success';
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      alert("Failed to submit booking. Please try again.");
+    }
   };
 
   // Derived totals
@@ -440,13 +467,16 @@ export default function BookingFormPage() {
   // Get the first item's currency as the base currency
   const baseCurrency = items.length > 0 ? items[0].currency || "USD" : "USD";
 
-  const totalsByCurrency = items.reduce((acc, it) => {
-    const qty = parseFloat(it.quantity || "0") || 0;
-    const val = parseFloat(it.value || "0") || 0;
-    const cur = baseCurrency; // Use base currency instead of individual item currency
-    acc[cur] = (acc[cur] || 0) + qty * val;
-    return acc;
-  }, {} as Record<string, number>);
+  const totalsByCurrency = items.reduce(
+    (acc, it) => {
+      const qty = parseFloat(it.quantity || "0") || 0;
+      const val = parseFloat(it.value || "0") || 0;
+      const cur = baseCurrency; // Use base currency instead of individual item currency
+      acc[cur] = (acc[cur] || 0) + qty * val;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   // Stable server/client currency formatting to avoid hydration mismatches
   const formatCurrency = (code: string, amount: number) => {
@@ -542,7 +572,7 @@ export default function BookingFormPage() {
                               key={iso}
                               value={dial}
                             >{`${iso} ${dial}`}</option>
-                          )
+                          ),
                         )}
                       </select>
                       <input
@@ -624,7 +654,7 @@ export default function BookingFormPage() {
                                 key={iso}
                                 value={dial}
                               >{`${iso} ${dial}`}</option>
-                            )
+                            ),
                           )}
                         </select>
                         <input
@@ -832,7 +862,7 @@ export default function BookingFormPage() {
                                 key={iso}
                                 value={dial}
                               >{`${iso} ${dial}`}</option>
-                            )
+                            ),
                           )}
                         </select>
                         <input
@@ -1063,7 +1093,7 @@ export default function BookingFormPage() {
                                 key={iso}
                                 value={dial}
                               >{`${iso} ${dial}`}</option>
-                            )
+                            ),
                           )}
                         </select>
                         <input
@@ -1348,7 +1378,7 @@ export default function BookingFormPage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "quantity",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -1368,7 +1398,7 @@ export default function BookingFormPage() {
                                   handlePackageChange(
                                     pkg.id,
                                     "packageType",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                                 className="w-full h-13 px-4 py-3 pr-12 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -1397,7 +1427,7 @@ export default function BookingFormPage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "weight",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -1423,7 +1453,7 @@ export default function BookingFormPage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "length",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -1448,7 +1478,7 @@ export default function BookingFormPage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "width",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -1473,7 +1503,7 @@ export default function BookingFormPage() {
                                 handlePackageChange(
                                   pkg.id,
                                   "height",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
@@ -1555,7 +1585,7 @@ export default function BookingFormPage() {
                               handleItemChange(
                                 item.id,
                                 "commodityCode",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
@@ -1572,7 +1602,7 @@ export default function BookingFormPage() {
                               handleItemChange(
                                 item.id,
                                 "description",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
@@ -1590,7 +1620,7 @@ export default function BookingFormPage() {
                               handleItemChange(
                                 item.id,
                                 "quantity",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
@@ -1613,7 +1643,7 @@ export default function BookingFormPage() {
                               handleItemChange(
                                 item.id,
                                 "weight",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
@@ -1643,7 +1673,7 @@ export default function BookingFormPage() {
                               handleItemChange(
                                 item.id,
                                 "currency",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             disabled={itemIndex > 0}
@@ -1672,7 +1702,7 @@ export default function BookingFormPage() {
                               handleItemChange(
                                 item.id,
                                 "countryOfOrigin",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="w-full h-11 px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D]"
@@ -1710,7 +1740,7 @@ export default function BookingFormPage() {
                             handleItemChange(
                               item.id,
                               "manufacturerDetails",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           className="w-full px-3 py-2 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB993C] text-[#324A6D] min-h-[70px]"
@@ -1804,7 +1834,7 @@ export default function BookingFormPage() {
                           <span className="text-2xl font-semibold text-[#1F447B]">
                             {formatCurrency(
                               baseCurrency,
-                              totalsByCurrency[baseCurrency] || 0
+                              totalsByCurrency[baseCurrency] || 0,
                             )}
                           </span>
                           <span className="text-[10px] tracking-wide text-[#324A6D]/70 uppercase">
