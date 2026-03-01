@@ -50,6 +50,10 @@ const COUNTRY_DIAL_CODES: Record<string, string> = {
 };
 
 export default function BookingFormPage() {
+  const BOOKINGS_API_BASE =
+    process.env.NEXT_PUBLIC_BOOKINGS_API_BASE ||
+    "https://it-smart-admin-hub.onrender.com";
+
   const [formData, setFormData] = useState({
     // Booking contact details
     bookingName: "",
@@ -428,7 +432,7 @@ export default function BookingFormPage() {
     };
 
     try {
-      const response = await fetch("http://localhost:3001/api/bookings", {
+      const response = await fetch(`${BOOKINGS_API_BASE}/api/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -14,7 +14,8 @@ interface Package {
 
 export default function QuotePage() {
   const BOOKINGS_API_BASE =
-    process.env.NEXT_PUBLIC_BOOKINGS_API_BASE || "http://localhost:3001";
+    process.env.NEXT_PUBLIC_BOOKINGS_API_BASE ||
+    "https://it-smart-admin-hub.onrender.com";
 
   const [formData, setFormData] = useState({
     fromPostcode: "",

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 
 type QuotePayload = Record<string, unknown>;
 
@@ -6,7 +7,10 @@ function toPrettyJson(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
 
-function buildEmailBody(formData: QuotePayload): { text: string; html: string } {
+function buildEmailBody(formData: QuotePayload): {
+  text: string;
+  html: string;
+} {
   const from = (formData.from as Record<string, unknown> | undefined) ?? {};
   const to = (formData.to as Record<string, unknown> | undefined) ?? {};
   const packages = Array.isArray(formData.packages) ? formData.packages : [];
@@ -39,22 +43,23 @@ function buildEmailBody(formData: QuotePayload): { text: string; html: string } 
 
 export async function POST(req: NextRequest) {
   const resendApiKey = process.env.RESEND_API_KEY;
-  const toEmail = process.env.QUOTE_NOTIFICATION_TO;
-  const fromEmail = process.env.QUOTE_NOTIFICATION_FROM;
 
-  if (!resendApiKey || !toEmail || !fromEmail) {
+  if (!resendApiKey) {
     return NextResponse.json(
       {
         ok: false,
         error: "missing_config",
-        message:
-          "RESEND_API_KEY, QUOTE_NOTIFICATION_TO, and QUOTE_NOTIFICATION_FROM must be configured.",
+        message: "RESEND_API_KEY must be configured.",
       },
       { status: 500 },
     );
   }
 
-  let body: { form_data?: QuotePayload; booking_id?: string; location?: string };
+  let body: {
+    form_data?: QuotePayload;
+    booking_id?: string;
+    location?: string;
+  };
   try {
     body = (await req.json()) as {
       form_data?: QuotePayload;
@@ -80,38 +85,29 @@ export async function POST(req: NextRequest) {
   const subjectParts = ["New quote request - Ship It Smart"];
   if (body.booking_id) subjectParts.push(`Booking ID: ${body.booking_id}`);
   if (body.location) subjectParts.push(`Location: ${body.location}`);
+  const resend = new Resend(resendApiKey);
 
   try {
-    const resendResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: [toEmail],
-        subject: subjectParts.join(" | "),
-        text,
-        html,
-      }),
+    const { data, error } = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: ["ae@globalamerican.us"],
+      subject: subjectParts.join(" | "),
+      text,
+      html,
     });
 
-    if (!resendResponse.ok) {
-      const details = await resendResponse.text();
+    if (error) {
       return NextResponse.json(
         {
           ok: false,
           error: "provider_error",
-          message: `Resend returned ${resendResponse.status}`,
-          details,
+          message: error.message,
         },
         { status: 502 },
       );
     }
 
-    const data = (await resendResponse.json()) as { id?: string };
-    return NextResponse.json({ ok: true, id: data.id });
+    return NextResponse.json({ ok: true, id: data?.id });
   } catch (error) {
     return NextResponse.json(
       {
