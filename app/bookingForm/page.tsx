@@ -50,9 +50,12 @@ const COUNTRY_DIAL_CODES: Record<string, string> = {
 };
 
 export default function BookingFormPage() {
+  const DEFAULT_BOOKINGS_API_BASE =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3003"
+      : "https://it-smart-admin-hub.onrender.com";
   const BOOKINGS_API_BASE =
-    process.env.NEXT_PUBLIC_BOOKINGS_API_BASE ||
-    "https://it-smart-admin-hub.onrender.com";
+    process.env.NEXT_PUBLIC_BOOKINGS_API_BASE || DEFAULT_BOOKINGS_API_BASE;
 
   const [formData, setFormData] = useState({
     // Booking contact details
