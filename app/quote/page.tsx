@@ -27,6 +27,7 @@ export default function QuotePage() {
     toCountry: "US",
     residentialAddress: false,
     requestPickup: false,
+    palletStackable: false,
     dangerousGoods: false,
     dangerousGoodsCategory: "",
     requiresInsurance: false,
@@ -83,6 +84,12 @@ export default function QuotePage() {
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (packageShipmentType !== "pallets") {
+      setFormData((prev) => ({ ...prev, palletStackable: false }));
+    }
+  }, [packageShipmentType]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -141,6 +148,7 @@ export default function QuotePage() {
       options: {
         residentialAddress: formData.residentialAddress,
         requestPickup: formData.requestPickup,
+        palletStackable: formData.palletStackable,
         dangerousGoods: formData.dangerousGoods,
         dangerousGoodsCategory: formData.dangerousGoodsCategory,
         requiresInsurance: formData.requiresInsurance,
@@ -381,6 +389,31 @@ export default function QuotePage() {
                         type="checkbox"
                         name="requestPickup"
                         checked={formData.requestPickup}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
+                        Pallet Stackable
+                      </label>
+                      <p className="text-xs text-[#EB993C] mt-1">
+                        Pallets can be safely stacked
+                      </p>
+                      <p className="text-xs text-[#324A6D] mt-1">
+                        Carrier reserves the right to charge a non stack fee if
+                        they deem the pallet to be non stackable.
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="palletStackable"
+                        checked={formData.palletStackable}
                         onChange={handleInputChange}
                         className="sr-only peer"
                       />
