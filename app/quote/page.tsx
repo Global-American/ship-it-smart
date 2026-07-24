@@ -13,14 +13,11 @@ interface Package {
 }
 
 export default function QuotePage() {
-  const DEFAULT_BOOKINGS_API_BASE =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3003"
-      : "https://it-smart-admin-hub.onrender.com";
-  const BOOKINGS_API_BASE =
-    process.env.NEXT_PUBLIC_BOOKINGS_API_BASE || DEFAULT_BOOKINGS_API_BASE;
-
   const [formData, setFormData] = useState({
+    contactName: "",
+    contactEmail: "",
+    contactPhoneCountryCode: "+1",
+    contactPhoneNumber: "",
     fromPostcode: "",
     fromCountry: "US",
     toPostcode: "",
@@ -54,8 +51,9 @@ export default function QuotePage() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isBenefitsVisible, setIsBenefitsVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [bgColor, setBgColor] = useState("#F4FAFC");
-  const [containerColor, setContainerColor] = useState("#e6ecf7");
+  const [containerColor, setContainerColor] = useState("#dbeafe");
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useRef<HTMLDivElement>(null);
@@ -137,6 +135,12 @@ export default function QuotePage() {
 
     // Create payload for quote request
     const payload = {
+      contact: {
+        name: formData.contactName,
+        email: formData.contactEmail,
+        phoneCountryCode: formData.contactPhoneCountryCode,
+        phoneNumber: formData.contactPhoneNumber,
+      },
       from: {
         country: formData.fromCountry,
         postcode: formData.fromPostcode,
@@ -161,15 +165,14 @@ export default function QuotePage() {
     };
 
     try {
-      const response = await fetch(`${BOOKINGS_API_BASE}/api/bookings`, {
+      setIsSubmitting(true);
+      const response = await fetch("/api/quote-submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          type_of_form: "quote",
-          form_data: payload,
-          location: "Ship It Smart",
+          payload,
         }),
       });
 
@@ -202,6 +205,8 @@ export default function QuotePage() {
     } catch (error) {
       console.error("Error submitting quote request:", error);
       alert("Failed to submit quote request. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -237,15 +242,84 @@ export default function QuotePage() {
               : "opacity-0 translate-y-4"
           }`}
           style={{ transitionDelay: "200ms" }}
-        >
-          <div
-            ref={formRef}
-            className="rounded-2xl shadow-lg p-6 sm:p-8 lg:p-12 xl:p-16 border-2 border-[#1F447B]"
-            style={{
-              backgroundColor: containerColor,
-            }}
           >
-            <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
+            <div
+              ref={formRef}
+              className="rounded-2xl shadow-lg p-6 sm:p-8 lg:p-12 xl:p-16 border-2 border-[#1F447B]"
+              style={{
+                backgroundColor: containerColor,
+              }}
+            >
+              <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
+              {packageShipmentType === "cartons" && (
+                <div>
+                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
+                    Contact Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        name="contactName"
+                        value={formData.contactName}
+                        onChange={handleInputChange}
+                        placeholder="Primary contact name"
+                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Phone
+                      </label>
+                      <div className="grid grid-cols-[140px_1fr] overflow-hidden rounded-lg border-2 border-[#1F447B] bg-white focus-within:ring-2 focus-within:ring-[#EB993C]">
+                        <select
+                          name="contactPhoneCountryCode"
+                          value={formData.contactPhoneCountryCode}
+                          onChange={handleInputChange}
+                          className="border-r-2 border-[#1F447B] bg-white px-4 py-3 text-[#324A6D] focus:outline-none"
+                          required
+                        >
+                          <option value="+1">US +1</option>
+                          <option value="+44">UK +44</option>
+                          <option value="+61">AU +61</option>
+                          <option value="+49">DE +49</option>
+                          <option value="+33">FR +33</option>
+                          <option value="+39">IT +39</option>
+                          <option value="+34">ES +34</option>
+                        </select>
+                        <input
+                          type="tel"
+                          name="contactPhoneNumber"
+                          value={formData.contactPhoneNumber}
+                          onChange={handleInputChange}
+                          placeholder="555 123 4567"
+                          className="w-full px-4 py-3 text-[#324A6D] focus:outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        name="contactEmail"
+                        value={formData.contactEmail}
+                        onChange={handleInputChange}
+                        placeholder="contact@example.com"
+                        className="w-full md:max-w-[calc(50%-0.75rem)] px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Addresses */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
@@ -816,16 +890,17 @@ export default function QuotePage() {
                 )}
               </div>
 
-              {/* Submit Button */}
-              <div className="text-center">
-                <button
-                  type="submit"
-                  className="bg-[#EB993C] hover:bg-[#d4822a] text-white font-semibold px-12 py-4 rounded-lg text-lg transition-colors duration-200 border-2 border-[#1F447B]"
-                >
-                  Get Quote
-                </button>
-              </div>
-            </form>
+                {/* Submit Button */}
+                <div className="text-center">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-[#EB993C] hover:bg-[#d4822a] text-white font-semibold px-12 py-4 rounded-lg text-lg transition-colors duration-200 border-2 border-[#1F447B]"
+                  >
+                    {isSubmitting ? "Submitting..." : "Get Quote"}
+                  </button>
+                </div>
+              </form>
           </div>
         </div>
 

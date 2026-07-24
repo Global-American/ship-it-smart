@@ -187,43 +187,36 @@ const brands = [
   {
     id: "usDomestic",
     name: "US Domestic",
-    description: "Optional Description",
     icon: <ShipIcon className="h-4 w-4" />,
   },
   {
     id: "usExports",
     name: "US Exports",
-    description: "Optional Description",
     icon: <TruckIcon className="h-4 w-4" />,
   },
   {
     id: "usImports",
     name: "US Imports",
-    description: "Optional Description",
     icon: <RotateCcwIcon className="h-4 w-4" />,
   },
   {
     id: "ukFinalMile",
     name: "UK Final Mile",
-    description: "Optional Description",
     icon: <PackageIcon className="h-4 w-4" />,
   },
   {
     id: "ukExports",
     name: "UK Exports",
-    description: "Optional Description",
     icon: <PackageIcon className="h-4 w-4" />,
   },
   {
     id: "chinaExports",
     name: "China Exports",
-    description: "Optional Description",
     icon: <PackageIcon className="h-4 w-4" />,
   },
   {
     id: "other",
     name: "Other",
-    description: "Optional Description",
     icon: <PackageIcon className="h-4 w-4" />,
   },
 ];
@@ -240,11 +233,8 @@ export default function ContactPage() {
     selectedBrands: [] as string[],
   });
   const [bgColor, setBgColor] = useState("#F4FAFC");
-  const [containerColor, setContainerColor] = useState("#e6ecf7");
+  const [containerColor, setContainerColor] = useState("#dbeafe");
   const sectionRef = useRef<HTMLElement>(null);
-
-  const API_BASE =
-    process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api/v1";
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -286,7 +276,7 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE}/contact`, {
+      const res = await fetch("/api/contact-submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -461,9 +451,6 @@ export default function ContactPage() {
                                 {brand.name}
                               </span>
                             </div>
-                            <p className="text-xs lg:text-sm text-muted-foreground leading-relaxed">
-                              {brand.description}
-                            </p>
                           </label>
                         </div>
                       </div>
