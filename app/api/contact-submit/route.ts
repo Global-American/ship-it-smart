@@ -6,6 +6,8 @@ type ContactPayload = {
   phone?: string;
   company?: string;
   message?: string;
+  country?: string;
+  countryName?: string;
   selectedBrands?: string[];
 };
 
@@ -78,6 +80,8 @@ export async function POST(req: NextRequest) {
           phone,
           company: asString(payload.company),
           message: asString(payload.message),
+          country: asString(payload.country),
+          countryName: asString(payload.countryName),
           selectedBrands: Array.isArray(payload.selectedBrands)
             ? payload.selectedBrands
             : [],

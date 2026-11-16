@@ -1,6 +1,32 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import {
+  ArrowRight,
+  Info,
+  Layers,
+  Package as PackageIcon,
+  Plus,
+  X,
+  Zap,
+} from "lucide-react";
+import {
+  ChoiceCard,
+  FormSection,
+  JoinedSelect,
+  OptionToggle,
+  SegmentedControl,
+  SelectField,
+  addButtonClass,
+  fieldClass,
+  joinedFieldClass,
+  joinedInputClass,
+  labelClass,
+  questionClass,
+  removeButtonClass,
+  submitButtonClass,
+  unitCardClass,
+} from "@/components/form-fields";
 
 interface Package {
   id: string;
@@ -11,6 +37,52 @@ interface Package {
   width: string;
   height: string;
 }
+
+const COUNTRY_OPTIONS = [
+  { code: "GB", name: "United Kingdom" },
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+  { code: "AU", name: "Australia" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "IT", name: "Italy" },
+  { code: "ES", name: "Spain" },
+  { code: "NL", name: "Netherlands" },
+  { code: "BE", name: "Belgium" },
+  { code: "CH", name: "Switzerland" },
+  { code: "AT", name: "Austria" },
+  { code: "IE", name: "Ireland" },
+  { code: "DK", name: "Denmark" },
+  { code: "SE", name: "Sweden" },
+  { code: "NO", name: "Norway" },
+  { code: "FI", name: "Finland" },
+  { code: "PL", name: "Poland" },
+  { code: "CZ", name: "Czech Republic" },
+  { code: "HU", name: "Hungary" },
+];
+
+const PHONE_CODES = [
+  { code: "+1", label: "US +1" },
+  { code: "+44", label: "UK +44" },
+  { code: "+61", label: "AU +61" },
+  { code: "+49", label: "DE +49" },
+  { code: "+33", label: "FR +33" },
+  { code: "+39", label: "IT +39" },
+  { code: "+34", label: "ES +34" },
+];
+
+const ADDRESS_SIDES = [
+  { title: "From", country: "fromCountry", postcode: "fromPostcode" },
+  { title: "To", country: "toCountry", postcode: "toPostcode" },
+] as const;
+
+const MEASUREMENT_OPTIONS = [
+  { value: "metric", label: "Metric (kg/cm)" },
+  { value: "imperial", label: "Imperial (lbs/in)" },
+];
+
+const benefitIconClass =
+  "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-[#1F447B] bg-white";
 
 export default function QuotePage() {
   const [formData, setFormData] = useState({
@@ -34,7 +106,8 @@ export default function QuotePage() {
   });
 
   // Package shipment type: 'cartons' or 'pallets'
-  const [packageShipmentType, setPackageShipmentType] = useState<string>("");
+  const [packageShipmentType, setPackageShipmentType] =
+    useState<string>("cartons");
 
   const [packages, setPackages] = useState<Package[]>([
     {
@@ -52,33 +125,40 @@ export default function QuotePage() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isBenefitsVisible, setIsBenefitsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bgColor, setBgColor] = useState("#F4FAFC");
-  const [containerColor, setContainerColor] = useState("#dbeafe");
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const reveal = (target: Element) => {
+      if (target === headerRef.current) setIsHeaderVisible(true);
+      if (target === formRef.current) setIsFormVisible(true);
+      if (target === benefitsRef.current) setIsBenefitsVisible(true);
+    };
+
+    // Reveal anything already on screen at load so the page doesn't sit
+    // invisible until the user scrolls (the form is much taller than the
+    // viewport, so a percentage threshold never triggers on its own).
+    const isInViewport = (el: Element) => {
+      const rect = el.getBoundingClientRect();
+      return rect.top < window.innerHeight && rect.bottom > 0;
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.target === headerRef.current && entry.isIntersecting) {
-            setIsHeaderVisible(true);
-          }
-          if (entry.target === formRef.current && entry.isIntersecting) {
-            setIsFormVisible(true);
-          }
-          if (entry.target === benefitsRef.current && entry.isIntersecting) {
-            setIsBenefitsVisible(true);
-          }
+          if (entry.isIntersecting) reveal(entry.target);
         });
       },
-      { threshold: 0.3 },
+      { threshold: 0.05 },
     );
 
-    if (headerRef.current) observer.observe(headerRef.current);
-    if (formRef.current) observer.observe(formRef.current);
-    if (benefitsRef.current) observer.observe(benefitsRef.current);
+    [headerRef, formRef, benefitsRef].forEach((ref) => {
+      const el = ref.current;
+      if (!el) return;
+      if (isInViewport(el)) reveal(el);
+      observer.observe(el);
+    });
 
     return () => observer.disconnect();
   }, []);
@@ -98,6 +178,9 @@ export default function QuotePage() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
+  const setMeasurementUnit = (measurementUnit: string) =>
+    setFormData((prev) => ({ ...prev, measurementUnit }));
 
   const handlePackageChange = (
     packageId: string,
@@ -129,6 +212,30 @@ export default function QuotePage() {
       setPackages((prev) => prev.filter((pkg) => pkg.id !== packageId));
     }
   };
+
+  const selectCartons = () => {
+    setPackageShipmentType("cartons");
+    setPackages((prev) =>
+      prev.map((pkg) => ({
+        ...pkg,
+        packageType: pkg.packageType === "pallet" ? "parcel" : pkg.packageType,
+      })),
+    );
+  };
+
+  const selectPallets = () => {
+    setPackageShipmentType("pallets");
+    setPackages((prev) =>
+      prev.map((pkg) => ({
+        ...pkg,
+        packageType: "pallet",
+      })),
+    );
+  };
+
+  const itemLabel = packageShipmentType === "pallets" ? "Pallet" : "Package";
+  const weightUnit = formData.measurementUnit === "metric" ? "kg" : "lbs";
+  const lengthUnit = formData.measurementUnit === "metric" ? "cm" : "in";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,9 +306,6 @@ export default function QuotePage() {
 
       console.log("Quote request submitted successfully:", result);
       alert("Quote request submitted successfully!");
-
-      // Optionally reset form or redirect
-      // window.location.href = '/quote/success';
     } catch (error) {
       console.error("Error submitting quote request:", error);
       alert("Failed to submit quote request. Please try again.");
@@ -211,353 +315,223 @@ export default function QuotePage() {
   };
 
   return (
-    <section
-      className="py-20 md:py-28 lg:py-36"
-      style={{ backgroundColor: bgColor }}
-    >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="pt-28 pb-16 md:pt-32 md:pb-20">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div
           ref={headerRef}
-          className={`text-center mb-12 lg:mb-20 transition-all duration-700 ${
+          className={`mb-10 max-w-2xl transition-all duration-700 md:mb-14 ${
             isHeaderVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-4"
           }`}
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-[#1F447B] mb-4">
-            Get Your <span className="text-[#EB993C]">Shipping Quote</span>
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+            <span className="text-[#1F447B]">Get Your</span>{" "}
+            <span className="text-[#EB993C]">Shipping Quote</span>
           </h1>
-          <p className="text-lg text-[#324A6D] max-w-2xl mx-auto">
-            Compare shipping rates from multiple carriers and find the best
-            option for your needs.
+          <p className="mt-4 text-lg leading-relaxed text-[#324A6D]/70">
+            Tell us what you&apos;re sending and where it&apos;s going, and
+            we&apos;ll find you the best rate across our carrier network.
           </p>
         </div>
 
-        {/* Quote Form */}
+        {/* Quote Form. No panel behind it: the steps sit on the page
+            background, split by navy rules like the contact page. */}
         <div
-          className={`max-w-5xl lg:max-w-6xl mx-auto transition-all duration-700 ${
+          ref={formRef}
+          className={`transition-all duration-700 ${
             isFormVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-4"
           }`}
           style={{ transitionDelay: "200ms" }}
-          >
-            <div
-              ref={formRef}
-              className="rounded-2xl shadow-lg p-6 sm:p-8 lg:p-12 xl:p-16 border-2 border-[#1F447B]"
-              style={{
-                backgroundColor: containerColor,
-              }}
+        >
+          <form onSubmit={handleSubmit} className="space-y-10 md:space-y-12">
+            <FormSection
+              step={1}
+              title="Contact Details"
+              description="Who should we send the quote to?"
             >
-              <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
-              {packageShipmentType === "cartons" && (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
-                    Contact Details
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        name="contactName"
-                        value={formData.contactName}
-                        onChange={handleInputChange}
-                        placeholder="Primary contact name"
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Phone
-                      </label>
-                      <div className="grid grid-cols-[140px_1fr] overflow-hidden rounded-lg border-2 border-[#1F447B] bg-white focus-within:ring-2 focus-within:ring-[#EB993C]">
-                        <select
-                          name="contactPhoneCountryCode"
-                          value={formData.contactPhoneCountryCode}
-                          onChange={handleInputChange}
-                          className="border-r-2 border-[#1F447B] bg-white px-4 py-3 text-[#324A6D] focus:outline-none"
-                          required
-                        >
-                          <option value="+1">US +1</option>
-                          <option value="+44">UK +44</option>
-                          <option value="+61">AU +61</option>
-                          <option value="+49">DE +49</option>
-                          <option value="+33">FR +33</option>
-                          <option value="+39">IT +39</option>
-                          <option value="+34">ES +34</option>
-                        </select>
-                        <input
-                          type="tel"
-                          name="contactPhoneNumber"
-                          value={formData.contactPhoneNumber}
-                          onChange={handleInputChange}
-                          placeholder="555 123 4567"
-                          className="w-full px-4 py-3 text-[#324A6D] focus:outline-none"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        name="contactEmail"
-                        value={formData.contactEmail}
-                        onChange={handleInputChange}
-                        placeholder="contact@example.com"
-                        className="w-full md:max-w-[calc(50%-0.75rem)] px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                        required
-                      />
-                    </div>
-                  </div>
+                  <label htmlFor="contactName" className={labelClass}>
+                    Name
+                  </label>
+                  <input
+                    id="contactName"
+                    type="text"
+                    name="contactName"
+                    value={formData.contactName}
+                    onChange={handleInputChange}
+                    placeholder="Primary contact name"
+                    className={fieldClass}
+                    required
+                  />
                 </div>
-              )}
-
-              {/* Addresses */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-[#1F447B]">From</h4>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Country
-                    </label>
-                    <select
-                      name="fromCountry"
-                      value={formData.fromCountry}
+                <div>
+                  <label htmlFor="contactPhoneNumber" className={labelClass}>
+                    Phone
+                  </label>
+                  <div className={joinedFieldClass}>
+                    <JoinedSelect
+                      name="contactPhoneCountryCode"
+                      aria-label="Phone country code"
+                      value={formData.contactPhoneCountryCode}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                       required
                     >
-                      <option value="GB">United Kingdom</option>
-                      <option value="US">United States</option>
-                      <option value="CA">Canada</option>
-                      <option value="AU">Australia</option>
-                      <option value="DE">Germany</option>
-                      <option value="FR">France</option>
-                      <option value="IT">Italy</option>
-                      <option value="ES">Spain</option>
-                      <option value="NL">Netherlands</option>
-                      <option value="BE">Belgium</option>
-                      <option value="CH">Switzerland</option>
-                      <option value="AT">Austria</option>
-                      <option value="IE">Ireland</option>
-                      <option value="DK">Denmark</option>
-                      <option value="SE">Sweden</option>
-                      <option value="NO">Norway</option>
-                      <option value="FI">Finland</option>
-                      <option value="PL">Poland</option>
-                      <option value="CZ">Czech Republic</option>
-                      <option value="HU">Hungary</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Postcode
-                    </label>
+                      {PHONE_CODES.map((phone) => (
+                        <option key={phone.code} value={phone.code}>
+                          {phone.label}
+                        </option>
+                      ))}
+                    </JoinedSelect>
                     <input
-                      type="text"
-                      name="fromPostcode"
-                      value={formData.fromPostcode}
+                      id="contactPhoneNumber"
+                      type="tel"
+                      name="contactPhoneNumber"
+                      value={formData.contactPhoneNumber}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                      placeholder="555 123 4567"
+                      className={joinedInputClass}
                       required
                     />
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-[#1F447B]">To</h4>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Country
-                    </label>
-                    <select
-                      name="toCountry"
-                      value={formData.toCountry}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      required
-                    >
-                      <option value="GB">United Kingdom</option>
-                      <option value="US">United States</option>
-                      <option value="CA">Canada</option>
-                      <option value="AU">Australia</option>
-                      <option value="DE">Germany</option>
-                      <option value="FR">France</option>
-                      <option value="IT">Italy</option>
-                      <option value="ES">Spain</option>
-                      <option value="NL">Netherlands</option>
-                      <option value="BE">Belgium</option>
-                      <option value="CH">Switzerland</option>
-                      <option value="AT">Austria</option>
-                      <option value="IE">Ireland</option>
-                      <option value="DK">Denmark</option>
-                      <option value="SE">Sweden</option>
-                      <option value="NO">Norway</option>
-                      <option value="FI">Finland</option>
-                      <option value="PL">Poland</option>
-                      <option value="CZ">Czech Republic</option>
-                      <option value="HU">Hungary</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                      Postcode
-                    </label>
-                    <input
-                      type="text"
-                      name="toPostcode"
-                      value={formData.toPostcode}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                      required
-                    />
-                  </div>
+                <div className="sm:col-span-2">
+                  <label htmlFor="contactEmail" className={labelClass}>
+                    Email
+                  </label>
+                  <input
+                    id="contactEmail"
+                    type="email"
+                    name="contactEmail"
+                    value={formData.contactEmail}
+                    onChange={handleInputChange}
+                    placeholder="contact@example.com"
+                    className={`${fieldClass} sm:max-w-[calc(50%-0.625rem)]`}
+                    required
+                  />
                 </div>
               </div>
+            </FormSection>
 
-              {/* Additional Options Toggles */}
-              <div>
-                <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
-                  Additional Options
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+            <FormSection
+              step={2}
+              title="Addresses"
+              description="Where the shipment is collected from and delivered to."
+            >
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-5">
+                {ADDRESS_SIDES.map((side) => (
+                  <div key={side.title} className="space-y-4">
+                    <h3 className="text-base font-semibold text-[#1F447B]">
+                      {side.title}
+                    </h3>
                     <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Residential Address
+                      <label htmlFor={side.country} className={labelClass}>
+                        Country
                       </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Delivery to a residential location
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="residentialAddress"
-                        checked={formData.residentialAddress}
+                      <SelectField
+                        id={side.country}
+                        name={side.country}
+                        value={formData[side.country]}
                         onChange={handleInputChange}
-                        className="sr-only peer"
+                        required
+                      >
+                        {COUNTRY_OPTIONS.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.name}
+                          </option>
+                        ))}
+                      </SelectField>
+                    </div>
+                    <div>
+                      <label htmlFor={side.postcode} className={labelClass}>
+                        Postcode
+                      </label>
+                      <input
+                        id={side.postcode}
+                        type="text"
+                        name={side.postcode}
+                        value={formData[side.postcode]}
+                        onChange={handleInputChange}
+                        className={fieldClass}
+                        required
                       />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
+                    </div>
                   </div>
+                ))}
+              </div>
+            </FormSection>
 
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                    <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Request Pickup
-                      </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Schedule a pickup from your location
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="requestPickup"
-                        checked={formData.requestPickup}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                    <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Pallet Stackable
-                      </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Pallets can be safely stacked
-                      </p>
-                      <p className="text-xs text-[#324A6D] mt-1">
-                        Carrier reserves the right to charge a non stack fee if
-                        they deem the pallet to be non stackable.
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="palletStackable"
-                        checked={formData.palletStackable}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                    <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Dangerous Goods
-                      </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Contains hazardous materials
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="dangerousGoods"
-                        checked={formData.dangerousGoods}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                    <div>
-                      <label className="text-sm font-medium text-[#324A6D] cursor-pointer">
-                        Requires Insurance
-                      </label>
-                      <p className="text-xs text-[#EB993C] mt-1">
-                        Add insurance coverage
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="requiresInsurance"
-                        checked={formData.requiresInsurance}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#1F447B] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#EB993C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EB993C]"></div>
-                    </label>
-                  </div>
-                </div>
+            <FormSection
+              step={3}
+              title="Additional Options"
+              description="Extra services and handling requirements for this shipment."
+            >
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <OptionToggle
+                  name="residentialAddress"
+                  checked={formData.residentialAddress}
+                  onChange={handleInputChange}
+                  title="Residential Address"
+                  description="Delivery to a residential location"
+                />
+                <OptionToggle
+                  name="requestPickup"
+                  checked={formData.requestPickup}
+                  onChange={handleInputChange}
+                  title="Request Pickup"
+                  description="Schedule a pickup from your location"
+                />
+                <OptionToggle
+                  name="palletStackable"
+                  checked={formData.palletStackable}
+                  onChange={handleInputChange}
+                  title="Pallet Stackable"
+                  description="Pallets can be safely stacked"
+                  note="Carrier reserves the right to charge a non stack fee if they deem the pallet to be non stackable."
+                />
+                <OptionToggle
+                  name="dangerousGoods"
+                  checked={formData.dangerousGoods}
+                  onChange={handleInputChange}
+                  title="Dangerous Goods"
+                  description="Contains hazardous materials"
+                />
+                <OptionToggle
+                  name="requiresInsurance"
+                  checked={formData.requiresInsurance}
+                  onChange={handleInputChange}
+                  title="Requires Insurance"
+                  description="Add insurance coverage"
+                />
               </div>
 
               {/* Dangerous Goods Category Dropdown */}
               {formData.dangerousGoods && (
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                <div>
+                  <label htmlFor="dangerousGoodsCategory" className={labelClass}>
                     Dangerous Goods Category
                   </label>
-                  <select
+                  <SelectField
+                    id="dangerousGoodsCategory"
                     name="dangerousGoodsCategory"
                     value={formData.dangerousGoodsCategory}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                     required={formData.dangerousGoods}
                   >
                     <option value="">Select Category</option>
                     <option value="DGR">DGR | Dangerous Goods</option>
                     <option value="DRY_ICE">DRY_ICE | Dry Ice</option>
                     <option value="LITHIUM">LITHIUM | Lithium Battery</option>
-                  </select>
-                  <p className="text-xs text-[#EB993C] mt-2 italic">
+                  </SelectField>
+                  <p className="mt-2 flex items-start gap-1.5 text-xs text-[#324A6D]/80">
+                    <Info
+                      className="mt-px h-3.5 w-3.5 shrink-0 text-[#EB993C]"
+                      aria-hidden
+                    />
                     Further documentation will be required prior to completion
                     of shipment.
                   </p>
@@ -566,34 +540,33 @@ export default function QuotePage() {
 
               {/* Insurance Details */}
               {formData.requiresInsurance && (
-                <div className="mt-4">
-                  <h3 className="text-xl font-semibold text-[#1F447B] mb-4">
-                    Insurance Details
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className={questionClass}>Insurance Details</h3>
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      <label htmlFor="insuranceValue" className={labelClass}>
                         Insurance Value
                       </label>
                       <input
+                        id="insuranceValue"
                         type="number"
                         name="insuranceValue"
                         value={formData.insuranceValue}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
+                        className={fieldClass}
                         step="0.01"
                         required={formData.requiresInsurance}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#324A6D] mb-2">
+                      <label htmlFor="insuranceCurrency" className={labelClass}>
                         Currency
                       </label>
-                      <select
+                      <SelectField
+                        id="insuranceCurrency"
                         name="insuranceCurrency"
                         value={formData.insuranceCurrency}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 pr-12 bg-white border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
                         required={formData.requiresInsurance}
                       >
                         <option value="GBP">GBP - British Pound</option>
@@ -603,352 +576,285 @@ export default function QuotePage() {
                         <option value="AUD">AUD - Australian Dollar</option>
                         <option value="CHF">CHF - Swiss Franc</option>
                         <option value="JPY">JPY - Japanese Yen</option>
-                      </select>
+                      </SelectField>
                     </div>
                   </div>
                 </div>
               )}
+            </FormSection>
 
-              {/* Package Details */}
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold text-[#1F447B]">
-                    {packageShipmentType === "pallets"
-                      ? "Pallet Details"
-                      : "Package Details"}
-                  </h3>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          name="measurementUnit"
-                          value="metric"
-                          checked={formData.measurementUnit === "metric"}
-                          onChange={handleInputChange}
-                          className="w-4 h-4 text-[#EB993C] bg-gray-100 border-gray-300 focus:ring-0 focus:ring-offset-0"
-                        />
-                        <span className="ml-2 text-sm text-[#324A6D]">
-                          Metric (kg/cm)
-                        </span>
-                      </label>
-                      <label className="flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          name="measurementUnit"
-                          value="imperial"
-                          checked={formData.measurementUnit === "imperial"}
-                          onChange={handleInputChange}
-                          className="w-4 h-4 text-[#EB993C] bg-gray-100 border-gray-300 focus:ring-0 focus:ring-offset-0"
-                        />
-                        <span className="ml-2 text-sm text-[#324A6D]">
-                          Imperial (lbs/in)
-                        </span>
-                      </label>
-                    </div>
+            <FormSection
+              step={4}
+              title={
+                packageShipmentType === "pallets"
+                  ? "Pallet Details"
+                  : "Package Details"
+              }
+              description="Weights and dimensions for each package."
+            >
+              <div className="space-y-6">
+                <div>
+                  <h3 className={questionClass}>What are you shipping?</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ChoiceCard
+                      icon={PackageIcon}
+                      title="Cartons / Packages"
+                      description="Individual parcels, boxes, or envelopes"
+                      selected={packageShipmentType === "cartons"}
+                      onSelect={selectCartons}
+                    />
+                    <ChoiceCard
+                      icon={Layers}
+                      title="Pallets / Skids"
+                      description="Palletized freight or skids"
+                      selected={packageShipmentType === "pallets"}
+                      onSelect={selectPallets}
+                    />
                   </div>
                 </div>
-
-                {/* Package Type Selection */}
-                <div className="mb-6 bg-white rounded-lg p-6 border border-[#1F447B]/20">
-                  <h4 className="text-lg font-semibold text-[#1F447B] mb-4">
-                    What are you shipping?
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setPackageShipmentType("cartons")}
-                      className={`p-6 rounded-lg border-2 transition-all ${
-                        packageShipmentType === "cartons"
-                          ? "border-[#EB993C] bg-[#EB993C]/10"
-                          : "border-[#1F447B]/20 hover:border-[#1F447B]/40"
-                      }`}
-                    >
-                      <div className="text-center">
-                        <h5 className="text-lg font-semibold text-[#1F447B] mb-2">
-                          Cartons / Packages
-                        </h5>
-                        <p className="text-sm text-[#324A6D]">
-                          Individual parcels, boxes, or envelopes
-                        </p>
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPackageShipmentType("pallets")}
-                      className={`p-6 rounded-lg border-2 transition-all ${
-                        packageShipmentType === "pallets"
-                          ? "border-[#EB993C] bg-[#EB993C]/10"
-                          : "border-[#1F447B]/20 hover:border-[#1F447B]/40"
-                      }`}
-                    >
-                      <div className="text-center">
-                        <h5 className="text-lg font-semibold text-[#1F447B] mb-2">
-                          Pallets / Skids
-                        </h5>
-                        <p className="text-sm text-[#324A6D]">
-                          Palletized freight or skids
-                        </p>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Multiple Packages - Only show when type is selected */}
-                {packageShipmentType && (
-                  <div className="space-y-6">
-                    {packages.map((pkg, index) => (
-                      <div
-                        key={pkg.id}
-                        className="bg-white rounded-lg p-6 border"
-                      >
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-lg font-medium text-[#1F447B]">
-                            {packageShipmentType === "pallets"
-                              ? `Pallet ${index + 1}`
-                              : `Package ${index + 1}`}
-                          </h4>
-                          {packages.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removePackage(pkg.id)}
-                              className="text-[#EB993C] hover:text-[#d4822a] px-3 py-1 text-sm border border-[#EB993C] rounded-md hover:bg-[#EB993C]/10 transition-colors"
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
-                        <div
-                          className={`grid grid-cols-1 md:grid-cols-3 ${
-                            packageShipmentType === "cartons"
-                              ? "lg:grid-cols-6"
-                              : "lg:grid-cols-5"
-                          } gap-4`}
-                        >
-                          <div>
-                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                              Quantity
-                            </label>
-                            <input
-                              type="number"
-                              value={pkg.quantity}
-                              onChange={(e) =>
-                                handlePackageChange(
-                                  pkg.id,
-                                  "quantity",
-                                  e.target.value,
-                                )
-                              }
-                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                              placeholder="1"
-                              min="1"
-                              required
-                            />
-                          </div>
-                          {packageShipmentType === "cartons" && (
-                            <div>
-                              <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                                Package Type
-                              </label>
-                              <select
-                                value={pkg.packageType}
-                                onChange={(e) =>
-                                  handlePackageChange(
-                                    pkg.id,
-                                    "packageType",
-                                    e.target.value,
-                                  )
-                                }
-                                className="w-full px-4 py-3 pr-12 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                              >
-                                <option value="envelope">Envelope</option>
-                                <option value="packet">Packet</option>
-                                <option value="parcel">Parcel</option>
-                              </select>
-                            </div>
-                          )}
-                          <div>
-                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                              {packageShipmentType === "pallets"
-                                ? "Pallet"
-                                : "Package"}{" "}
-                              Weight (
-                              {formData.measurementUnit === "metric"
-                                ? "kg"
-                                : "lbs"}
-                              )
-                            </label>
-                            <input
-                              type="number"
-                              value={pkg.weight}
-                              onChange={(e) =>
-                                handlePackageChange(
-                                  pkg.id,
-                                  "weight",
-                                  e.target.value,
-                                )
-                              }
-                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                              step="0.1"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                              {packageShipmentType === "pallets"
-                                ? "Pallet"
-                                : "Package"}{" "}
-                              Length (
-                              {formData.measurementUnit === "metric"
-                                ? "cm"
-                                : "in"}
-                              )
-                            </label>
-                            <input
-                              type="number"
-                              value={pkg.length}
-                              onChange={(e) =>
-                                handlePackageChange(
-                                  pkg.id,
-                                  "length",
-                                  e.target.value,
-                                )
-                              }
-                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                              {packageShipmentType === "pallets"
-                                ? "Pallet"
-                                : "Package"}{" "}
-                              Width (
-                              {formData.measurementUnit === "metric"
-                                ? "cm"
-                                : "in"}
-                              )
-                            </label>
-                            <input
-                              type="number"
-                              value={pkg.width}
-                              onChange={(e) =>
-                                handlePackageChange(
-                                  pkg.id,
-                                  "width",
-                                  e.target.value,
-                                )
-                              }
-                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-[#324A6D] mb-2">
-                              {packageShipmentType === "pallets"
-                                ? "Pallet"
-                                : "Package"}{" "}
-                              Height (
-                              {formData.measurementUnit === "metric"
-                                ? "cm"
-                                : "in"}
-                              )
-                            </label>
-                            <input
-                              type="number"
-                              value={pkg.height}
-                              onChange={(e) =>
-                                handlePackageChange(
-                                  pkg.id,
-                                  "height",
-                                  e.target.value,
-                                )
-                              }
-                              className="w-full px-4 py-3 bg-[#F4FAFC] border-2 border-[#1F447B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EB993C] focus:bg-white transition-all text-[#324A6D]"
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* Add Package Button */}
-                    <div className="mt-4">
-                      <button
-                        type="button"
-                        onClick={addPackage}
-                        className="bg-[#1F447B] hover:bg-[#1a3a6b] text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2 border-2 border-[#EB993C]"
-                      >
-                        <span className="text-lg">+</span>
-                        Add Another{" "}
-                        {packageShipmentType === "pallets"
-                          ? "Pallet"
-                          : "Package"}
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <SegmentedControl
+                  label="Units"
+                  name="measurementUnit"
+                  value={formData.measurementUnit}
+                  options={MEASUREMENT_OPTIONS}
+                  onChange={setMeasurementUnit}
+                />
               </div>
 
-                {/* Submit Button */}
-                <div className="text-center">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="bg-[#EB993C] hover:bg-[#d4822a] text-white font-semibold px-12 py-4 rounded-lg text-lg transition-colors duration-200 border-2 border-[#1F447B]"
-                  >
-                    {isSubmitting ? "Submitting..." : "Get Quote"}
-                  </button>
-                </div>
-              </form>
-          </div>
+              <div className="space-y-4">
+                {packages.map((pkg, index) => (
+                  <div key={pkg.id} className={unitCardClass}>
+                    <div className="mb-4 flex items-center justify-between gap-4">
+                      <h4 className="text-base font-semibold text-[#1F447B]">
+                        {itemLabel} {index + 1}
+                      </h4>
+                      {packages.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removePackage(pkg.id)}
+                          className={removeButtonClass}
+                        >
+                          <X className="h-4 w-4" aria-hidden />
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    <div
+                      className={`grid grid-cols-2 items-end gap-4 md:grid-cols-3 ${
+                        packageShipmentType === "cartons"
+                          ? "xl:grid-cols-6"
+                          : "xl:grid-cols-5"
+                      }`}
+                    >
+                      <div>
+                        <label
+                          htmlFor={`package-${pkg.id}-quantity`}
+                          className={labelClass}
+                        >
+                          Quantity
+                        </label>
+                        <input
+                          id={`package-${pkg.id}-quantity`}
+                          type="number"
+                          value={pkg.quantity}
+                          onChange={(e) =>
+                            handlePackageChange(
+                              pkg.id,
+                              "quantity",
+                              e.target.value,
+                            )
+                          }
+                          className={fieldClass}
+                          placeholder="1"
+                          min="1"
+                          required
+                        />
+                      </div>
+                      {packageShipmentType === "cartons" && (
+                        <div>
+                          <label
+                            htmlFor={`package-${pkg.id}-type`}
+                            className={labelClass}
+                          >
+                            Type
+                          </label>
+                          <SelectField
+                            id={`package-${pkg.id}-type`}
+                            value={pkg.packageType}
+                            onChange={(e) =>
+                              handlePackageChange(
+                                pkg.id,
+                                "packageType",
+                                e.target.value,
+                              )
+                            }
+                          >
+                            <option value="envelope">Envelope</option>
+                            <option value="packet">Packet</option>
+                            <option value="parcel">Parcel</option>
+                          </SelectField>
+                        </div>
+                      )}
+                      <div>
+                        <label
+                          htmlFor={`package-${pkg.id}-weight`}
+                          className={labelClass}
+                        >
+                          Weight ({weightUnit})
+                        </label>
+                        <input
+                          id={`package-${pkg.id}-weight`}
+                          type="number"
+                          value={pkg.weight}
+                          onChange={(e) =>
+                            handlePackageChange(pkg.id, "weight", e.target.value)
+                          }
+                          className={fieldClass}
+                          step="0.1"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor={`package-${pkg.id}-length`}
+                          className={labelClass}
+                        >
+                          Length ({lengthUnit})
+                        </label>
+                        <input
+                          id={`package-${pkg.id}-length`}
+                          type="number"
+                          value={pkg.length}
+                          onChange={(e) =>
+                            handlePackageChange(pkg.id, "length", e.target.value)
+                          }
+                          className={fieldClass}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor={`package-${pkg.id}-width`}
+                          className={labelClass}
+                        >
+                          Width ({lengthUnit})
+                        </label>
+                        <input
+                          id={`package-${pkg.id}-width`}
+                          type="number"
+                          value={pkg.width}
+                          onChange={(e) =>
+                            handlePackageChange(pkg.id, "width", e.target.value)
+                          }
+                          className={fieldClass}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor={`package-${pkg.id}-height`}
+                          className={labelClass}
+                        >
+                          Height ({lengthUnit})
+                        </label>
+                        <input
+                          id={`package-${pkg.id}-height`}
+                          type="number"
+                          value={pkg.height}
+                          onChange={(e) =>
+                            handlePackageChange(pkg.id, "height", e.target.value)
+                          }
+                          className={fieldClass}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addPackage}
+                  className={addButtonClass}
+                >
+                  <Plus className="h-4 w-4" aria-hidden />
+                  Add Another {itemLabel}
+                </button>
+              </div>
+            </FormSection>
+
+            {/* Submit Button */}
+            <div className="flex border-t border-[#1F447B] pt-8 sm:justify-end">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={submitButtonClass}
+              >
+                {isSubmitting ? "Submitting..." : "Get Quote"}
+                <ArrowRight className="h-5 w-5" aria-hidden />
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* Benefits */}
         <div
           ref={benefitsRef}
-          className={`mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-700 ${
+          className={`mt-16 grid grid-cols-1 gap-8 md:mt-20 md:grid-cols-3 transition-all duration-700 ${
             isBenefitsVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-4"
           }`}
           style={{ transitionDelay: "400ms" }}
         >
-          <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
-              <span className="text-[#1F447B] text-2xl font-bold">$</span>
+          <div className="flex gap-4">
+            <span className={benefitIconClass}>
+              <Zap
+                className="h-6 w-6 text-[#EB993C]"
+                fill="currentColor"
+                strokeWidth={1.5}
+                aria-hidden
+              />
+            </span>
+            <div>
+              <h3 className="text-lg font-semibold text-[#1F447B]">
+                Instant Quotes
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-[#324A6D]/80">
+                View real-time pricing in seconds with our advanced quoting
+                engine.
+              </p>
             </div>
-            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-              Best Rates
-            </h3>
-            <p className="text-[#324A6D]">
-              Compare prices from multiple carriers to find the most competitive
-              shipping rates.
-            </p>
           </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
-              <span className="text-[#1F447B] text-2xl font-bold">⚡</span>
+          <div className="flex gap-4">
+            <span className={benefitIconClass}>
+              <span className="text-2xl font-bold leading-none text-[#EB993C]">
+                $
+              </span>
+            </span>
+            <div>
+              <h3 className="text-lg font-semibold text-[#1F447B]">
+                Best Rates
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-[#324A6D]/80">
+                Compare prices from multiple carriers to find the most
+                competitive shipping rates.
+              </p>
             </div>
-            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-              Instant Quotes
-            </h3>
-            <p className="text-[#324A6D]">
-              Get real-time shipping quotes in seconds with our advanced pricing
-              engine.
-            </p>
           </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-[#e6ecf7] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1F447B]">
-              <span className="text-[#1F447B] text-2xl font-bold">📦</span>
+          <div className="flex gap-4">
+            <span className={benefitIconClass}>
+              <PackageIcon className="h-6 w-6 text-[#EB993C]" aria-hidden />
+            </span>
+            <div>
+              <h3 className="text-lg font-semibold text-[#1F447B]">
+                Multiple Carriers
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-[#324A6D]/80">
+                Choose from Royal Mail, DPD, UPS, FedEx, DHL and many more
+                carriers.
+              </p>
             </div>
-            <h3 className="text-xl font-semibold text-[#1F447B] mb-2">
-              Multiple Carriers
-            </h3>
-            <p className="text-[#324A6D]">
-              Choose from Royal Mail, DPD, UPS, FedEx, DHL and many more
-              carriers.
-            </p>
           </div>
         </div>
       </div>

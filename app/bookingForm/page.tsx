@@ -50,13 +50,6 @@ const COUNTRY_DIAL_CODES: Record<string, string> = {
 };
 
 export default function BookingFormPage() {
-  const DEFAULT_BOOKINGS_API_BASE =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3003"
-      : "https://it-smart-admin-hub.onrender.com";
-  const BOOKINGS_API_BASE =
-    process.env.NEXT_PUBLIC_BOOKINGS_API_BASE || DEFAULT_BOOKINGS_API_BASE;
-
   const [formData, setFormData] = useState({
     // Booking contact details
     bookingName: "",
@@ -435,16 +428,12 @@ export default function BookingFormPage() {
     };
 
     try {
-      const response = await fetch(`${BOOKINGS_API_BASE}/api/bookings`, {
+      const response = await fetch("/api/booking-submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          type_of_form: "booking",
-          form_data: payload,
-          location: `Ship It Smart`,
-        }),
+        body: JSON.stringify({ payload }),
       });
 
       if (!response.ok) {
@@ -452,8 +441,52 @@ export default function BookingFormPage() {
       }
 
       const result = await response.json();
-      console.log("Booking submitted successfully:", result);
-      alert("Booking submitted successfully!");
+      const bookingData = (result?.data ?? {}) as {
+        booking_reference?: string;
+        upload_token?: string;
+      };
+      const bookingReference = bookingData.booking_reference;
+
+      // The booking exists at this point, so a document upload failure must
+      // not read as a failed booking — it gets its own note instead.
+      let documentsNote = "";
+      if (formData.uploadDocuments && documents.length > 0) {
+        documentsNote =
+          "\n\nYour documents could not be attached automatically. Please send them to us by email, quoting your booking reference.";
+        if (bookingData.upload_token) {
+          try {
+            const documentsForm = new FormData();
+            documentsForm.append("token", bookingData.upload_token);
+            documents.forEach((file) =>
+              documentsForm.append("documents", file, file.name),
+            );
+            const documentsResponse = await fetch("/api/booking-documents", {
+              method: "POST",
+              body: documentsForm,
+            });
+            if (documentsResponse.ok) {
+              documentsNote = `\n\n${documents.length} document${
+                documents.length !== 1 ? "s" : ""
+              } attached to your booking.`;
+            } else {
+              const documentsError = (await documentsResponse
+                .json()
+                .catch(() => null)) as { message?: string } | null;
+              if (documentsError?.message) {
+                documentsNote = `\n\nYour documents could not be attached: ${documentsError.message} Please send them to us by email, quoting your booking reference.`;
+              }
+            }
+          } catch (documentsError) {
+            console.error("Error uploading booking documents:", documentsError);
+          }
+        }
+      }
+
+      alert(
+        (bookingReference
+          ? `Booking submitted successfully! Your reference is ${bookingReference}.`
+          : "Booking submitted successfully!") + documentsNote,
+      );
 
       // Optionally reset form or redirect
       // window.location.href = '/bookings/success';
